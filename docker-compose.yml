@@ -22,4 +22,4 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./backend/Software.Specification.Builder/:/app
+      - ./backend/API/:/app

@@ -13,9 +13,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/app/Software.Specification.Builder.csproj",
-      "projectName": "Software.Specification.Builder",
-      "projectPath": "/app/Software.Specification.Builder.csproj",
+      "projectUniqueName": "/app/API.csproj",
+      "projectName": "API",
+      "projectPath": "/app/API.csproj",
       "packagesPath": "/root/.nuget/packages/",
       "outputPath": "/app/obj/",
       "projectStyle": "PackageReference",
