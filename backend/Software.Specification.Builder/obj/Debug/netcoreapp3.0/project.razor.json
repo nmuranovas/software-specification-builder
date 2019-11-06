@@ -1,0 +1,16 @@
+{
+  "FilePath": "c:\\Projects\\software-specification-builder\\backend\\Software.Specification.Builder\\Software.Specification.Builder.csproj",
+  "Configuration": {
+    "ConfigurationName": "MVC-3.0",
+    "LanguageVersion": "3.0",
+    "Extensions": [
+      {
+        "ExtensionName": "MVC-3.0"
+      }
+    ]
+  },
+  "ProjectWorkspaceState": null,
+  "RootNamespace": "Software.Specification.Builder",
+  "Documents": [],
+  "SerializationFormat": "0.2"
+}
