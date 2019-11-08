@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useAuth0 } from '../services/react-auth0-spa'
+import { useAuth0 } from '../../services/react-auth0-spa'
 import { Route } from 'react-router-dom';
 
 type PrivateRouteProps = {

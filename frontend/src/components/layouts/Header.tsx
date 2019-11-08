@@ -33,7 +33,14 @@ export default function Header() {
         <Button onClick={() => logout()} color="inherit">Logout</Button>
     ) : (
             <Button onClick={() => loginWithRedirect()} color="inherit">Login</Button>
-        )
+        );
+
+    const profileLink = isAuthenticated ?
+        (
+            <Button>
+                <Link to="/profile">Profile</Link>
+            </Button>
+        ) : null;
 
     return (
         <AppBar position="static">
@@ -47,8 +54,9 @@ export default function Header() {
                 <Button>
                     <Link to="/">Home</Link>
                 </Button>
+                {profileLink}
                 <Button>
-                    <Link to="/profile">Profile</Link>
+                    <Link to="/specifications">Specifications</Link>
                 </Button>
                 {loginLogoutButtons}
             </Toolbar>
