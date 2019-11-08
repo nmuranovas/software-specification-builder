@@ -1,10 +1,15 @@
 import React from 'react'
-import { Grid, Paper, Card, CardHeader } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
+import Specification from './Specification';
 
 const useStyles = makeStyles(theme => ({
     grid: {
         margin: theme.spacing(1, 1)
+    },
+    media: {
+        height: 0,
+        paddingTop: '56.25%', // 16:9
     },
     paper: {
         height: 140,
@@ -12,49 +17,37 @@ const useStyles = makeStyles(theme => ({
     },
     card: {
         maxWidth: 345
+    },
+    expand: {
+        transform: 'rotate(0deg)',
+        marginLeft: 'auto',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest
+        })
+    },
+    expandOpen: {
+        transform: 'rotate(180deg)'
     }
 }));
 
-type SpecificationProps = {
-    title: string,
-    creationDate: string
-}
-
-const Specification: React.FunctionComponent<SpecificationProps> = props => {
-    const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false)
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    }
-
-    return (
-        <Card className={classes.card}>
-            <CardHeader 
-                title={props.title}
-                subheader={props.creationDate}>
-
-            </CardHeader>
-        </Card>
-    )
-}
 
 const Specifications = () => {
-    const nums = [0, 1, 2];
+    const specifications = [
+        { title: "Spec1", creationDate: "2019-10-10" },
+        { title: "Spec2", creationDate: "2019-11-11" },
+        { title: "Spec2", creationDate: "2019-11-11" },
+    ];
     const classes = useStyles();
 
-    const gridItems = nums.map(num => (
-        <Grid key={num} item>
-            <Paper className={classes.paper} />
+    const specComponents = specifications.map(spec => (
+        <Grid item>
+            <Specification title={spec.title} creationDate={spec.creationDate} />
         </Grid>
-    ))
+    ));
 
     return (
-        <Grid className={classes.grid} container spacing={2}>
-            <Grid item xs={12}>
-                <Grid container justify="center" spacing={2}>
-                    {gridItems}
-                </Grid>
-            </Grid>
+        <Grid className={classes.grid} container justify="center" spacing={4}>
+            {specComponents}
         </Grid>
     )
 }
