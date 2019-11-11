@@ -10,9 +10,6 @@ COPY ./API/Directory.Build.props ./API/
 COPY ./Persistence/Persistence.csproj ./Persistence/Persistence.csproj
 COPY ./API.Tests.Integration/API.Tests.Integration.csproj ./API.Tests.Integration/API.Tests.Integration.csproj
 
-
-RUN ls
-
 RUN dotnet restore
 
 COPY . .
