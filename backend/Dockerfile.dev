@@ -1,9 +1,20 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0 as build-env
+
+ENV DOTNET_USE_POLLING_FILE_WATCHER 1
+
 WORKDIR /app
 
-COPY /API/*.csproj ./
+COPY ["./Software Specification Builder.sln", "./"]
+COPY ./API/API.csproj ./API/API.csproj
+COPY ./API/Directory.Build.props ./API/
+COPY ./Persistence/Persistence.csproj ./Persistence/Persistence.csproj
+COPY ./API.Tests.Integration/API.Tests.Integration.csproj ./API.Tests.Integration/API.Tests.Integration.csproj
+
+
+RUN ls
+
 RUN dotnet restore
 
-COPY /API/ .
+COPY . .
 
-CMD ["dotnet", "watch", "run", "--project", "API.csproj"]
+CMD ["dotnet", "watch", "--project", "API", "run"]

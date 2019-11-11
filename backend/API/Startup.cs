@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Persistence;
 
 namespace Software.Specification.Builder
 {
@@ -29,6 +31,8 @@ namespace Software.Specification.Builder
                 options.Audience = Configuration["Auth0:Audience"];
             });
             services.AddControllers();
+            services.AddDbContext<SpecificationContext>(options =>
+                options.UseNpgsql(Configuration["ConnectionStrings:SpecificationContext"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
