@@ -6,8 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Persistence;
-using Persistence.Commands;
-using Persistence.Queries;
 
 namespace Software.Specification.Builder
 {
@@ -39,8 +37,7 @@ namespace Software.Specification.Builder
                 options.UseNpgsql(Configuration["ConnectionStrings:SpecificationContext"]));
 
             // Command and query service registration
-            services.AddScoped<IBlogCommands, BlogCommands>();
-            services.AddScoped<IBlogQueries, BlogQueries>();
+
 
             // Generated services
             services.AddControllers();
