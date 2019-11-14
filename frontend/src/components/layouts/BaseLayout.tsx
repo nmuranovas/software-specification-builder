@@ -8,10 +8,10 @@ const BaseLayout: React.FunctionComponent = props => {
 
   return (
     <div>
-      <CssBaseline/>
-      <Header/>
+      <CssBaseline />
+      <Header />
       {props.children}
-      <Footer/>
+      <Footer />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import Header from './components/layouts/Header';
 import Footer from './components/layouts/Footer';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Specifications from './components/specification/Specifications';
+import SpecificationBuilder from './components/specification-builder/SpecificationBuilder';
 
 const App: React.FunctionComponent = () => {
 
@@ -23,6 +24,7 @@ const App: React.FunctionComponent = () => {
       <BrowserRouter>
         <Header />
         <Switch>
+          <Route path="/specification-builder" component={SpecificationBuilder} />
           <Route path="/specifications" component={Specifications} />
           <Route path="/" exact component={Home} />
           <PrivateRoute path="/profile" Component={Profile} />

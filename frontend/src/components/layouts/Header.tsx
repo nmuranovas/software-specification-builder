@@ -58,6 +58,9 @@ export default function Header() {
                 <Button>
                     <Link to="/specifications">Specifications</Link>
                 </Button>
+                <Button>
+                    <Link to="/specification-builder">Builder</Link>
+                </Button>
                 {loginLogoutButtons}
             </Toolbar>
         </AppBar>
