@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,12 +54,17 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{pageNumber}/{pageSize}")]
-        public ActionResult<ICollection<Specification>> Get(int pageNumber, int pageSize)
+        [HttpGet("{pageNumber}/{itemCount}")]
+        public ActionResult<PaginatedSpecifications> Get(int pageNumber, int itemCount)
         {
-            var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, pageSize);
+            var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, itemCount);
+            var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
 
-            return specifications.ToList();
+            return new PaginatedSpecifications
+            {
+                Specifications = specifications,
+                TotalPageCount = totalSpecificationCount / itemCount
+            };
         }
 
         [HttpPost]

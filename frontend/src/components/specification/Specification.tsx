@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 
 type SpecificationProps = {
     title: string,
-    creationDate: string
+    creationDate: Date
 }
 
 const Specification: React.FunctionComponent<SpecificationProps> = props => {

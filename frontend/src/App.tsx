@@ -25,7 +25,7 @@ const App: React.FunctionComponent = () => {
         <Header />
         <Switch>
           <Route path="/specification-builder" component={SpecificationBuilder} />
-          <Route path="/specifications" component={Specifications} />
+          <Route path="/specifications/:page/:count" component={Specifications} />
           <Route path="/" exact component={Home} />
           <PrivateRoute path="/profile" Component={Profile} />
         </Switch>

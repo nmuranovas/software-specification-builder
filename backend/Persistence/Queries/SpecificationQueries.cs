@@ -22,6 +22,11 @@ namespace Persistence.Queries
             return _context.Specifications.Skip(pageNumber * pageSize).Take(pageSize);
         }
 
+        public int GetTotalSpecificationCount()
+        {
+            return _context.Specifications.Count();
+        }
+
         public Task<Specification> FetchByIdAsync(int id)
         {
             return _context.Specifications.FirstOrDefaultAsync(s => s.Id == id);

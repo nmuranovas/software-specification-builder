@@ -119,7 +119,7 @@ namespace API.Tests.Integration.ControllerTests
             context.SaveChanges();
 
             var result = specificationController.Get(1, 2);
-            var specifications = result.Value.ToList();
+            var specifications = result.Value.Specifications.ToList();
 
             Assert.Equal(dummySpecs[2].Title, specifications[0].Title);
             Assert.Equal(dummySpecs[3].Title, specifications[1].Title);
