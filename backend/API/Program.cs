@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Software.Specification.Builder
+namespace API
 {
     public class Program
     {

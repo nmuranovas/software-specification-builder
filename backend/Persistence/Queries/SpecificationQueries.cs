@@ -2,6 +2,7 @@
 using Persistence.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,11 @@ namespace Persistence.Queries
         public SpecificationQueries(SpecificationContext context)
         {
             _context = context;
+        }
+
+        public IEnumerable<Specification> FindAllByPageNumberAndSize(int pageNumber, int pageSize)
+        {
+            return _context.Specifications.Skip(pageNumber * pageSize).Take(pageSize);
         }
 
         public Task<Specification> FetchByIdAsync(int id)

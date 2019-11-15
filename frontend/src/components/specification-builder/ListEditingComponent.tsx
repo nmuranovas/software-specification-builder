@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Typography, TextField, makeStyles, Theme, createStyles, Button, Grid, IconButton } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -12,29 +12,34 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 )
 
-const FunctionalRequirementsForm = () => {
+type ListEditingComponentProps = {
+    title: string,
+    values: string[],
+    valuesChanged: ((newValues: string[]) => void)
+}
+
+const ListEditingComponent = (props: ListEditingComponentProps) => {
     const classes = useStyles();
-    const [functionalRequirements, setFunctionalRequirements] = useState(["Example requirement"]);
 
     const handleRequirementChange = (index: number, newValue: string) => {
-        const requirements = functionalRequirements.slice();
-        requirements[index] = newValue;
-        setFunctionalRequirements(requirements);
+        const valuesCopy = props.values.slice();
+        valuesCopy[index] = newValue;
+        props.valuesChanged(valuesCopy);
     }
 
     const removeRequirement = (index: number) => {
-        const requirementCopy = functionalRequirements.slice();
-        requirementCopy.splice(index, 1);
-        setFunctionalRequirements(requirementCopy);
+        const valuesCopy = props.values.slice();
+        valuesCopy.splice(index, 1);
+        props.valuesChanged(valuesCopy);
     }
 
     const addNewRequirement = () => {
-        const requirementCopy = functionalRequirements.slice();
-        requirementCopy.push("");
-        setFunctionalRequirements(requirementCopy);
+        const valuesCopy = props.values.slice();
+        valuesCopy.push("");
+        props.valuesChanged(valuesCopy);
     }
 
-    const requirementTextFields = functionalRequirements.map((fr, index) => (
+    const requirementTextFields = props.values.map((fr, index) => (
         <React.Fragment>
             <Grid container alignItems="center">
                 <Grid item xs={11}>
@@ -48,10 +53,10 @@ const FunctionalRequirementsForm = () => {
                         label={`Requirement #${index + 1} description`} />
                 </Grid>
                 <Grid item xs={1}>
-                    <IconButton aria-label="delete" 
+                    <IconButton aria-label="delete"
                         color="secondary"
                         onClick={() => removeRequirement(index)}>
-                        <DeleteIcon/>
+                        <DeleteIcon />
                     </IconButton>
                 </Grid>
             </Grid>
@@ -61,16 +66,14 @@ const FunctionalRequirementsForm = () => {
     return (
         <React.Fragment>
             <Typography variant="h5" component="h3" gutterBottom>
-                Functional requirements
+                {props.title}
             </Typography>
-            <Typography gutterBottom>
-                {requirementTextFields}
-            </Typography>
-            <Button onClick={addNewRequirement} disabled={maximumFRCount === functionalRequirements.length} variant="contained" color="primary">
+            {requirementTextFields}
+            <Button onClick={addNewRequirement} disabled={maximumFRCount === props.values.length} variant="contained" color="primary">
                 Add requirement
             </Button>
         </React.Fragment>
     )
 }
 
-export default FunctionalRequirementsForm
+export default ListEditingComponent

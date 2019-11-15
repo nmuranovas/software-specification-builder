@@ -1,6 +1,6 @@
 using System;
 
-namespace Software.Specification.Builder
+namespace API
 {
     public class WeatherForecast
     {

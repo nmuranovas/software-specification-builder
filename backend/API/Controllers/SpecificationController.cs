@@ -53,6 +53,14 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("{pageNumber}/{pageSize}")]
+        public ActionResult<ICollection<Specification>> Get(int pageNumber, int pageSize)
+        {
+            var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, pageSize);
+
+            return specifications.ToList();
+        }
+
         [HttpPost]
         public async Task<ActionResult<Specification>> Post(Specification specification)
         {

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using API.Controllers;
 using API.Tests.Integration.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -104,6 +105,24 @@ namespace API.Tests.Integration.ControllerTests
             var result = await specificationController.Put(dummy.Id, dummy);
 
             Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task GetShouldReturn3RdAnd4ThSpecificationsIfDatabaseHas5()
+        {
+            await using var context = InMemorySpecificationContextFactory.CreateInMemorySpecificationContext();
+            var specificationQueries = new SpecificationQueries(context);
+            var specificationController = new SpecificationController(null, specificationQueries);
+
+            var dummySpecs = Enumerable.Range(0, 5).Select(num => new Specification{Title = num.ToString()}).ToList();
+            context.Specifications.AddRange(dummySpecs);
+            context.SaveChanges();
+
+            var result = specificationController.Get(1, 2);
+            var specifications = result.Value.ToList();
+
+            Assert.Equal(dummySpecs[2].Title, specifications[0].Title);
+            Assert.Equal(dummySpecs[3].Title, specifications[1].Title);
         }
     }
 }
