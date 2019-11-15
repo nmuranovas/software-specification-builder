@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import Specification from './Specification';
+import SpecificationModal from './SpecificationModal';
 
 const useStyles = makeStyles(theme => ({
     grid: {
@@ -33,22 +34,39 @@ const useStyles = makeStyles(theme => ({
 
 const Specifications = () => {
     const specifications = [
-        { title: "Spec1", creationDate: "2019-10-10" },
-        { title: "Spec2", creationDate: "2019-11-11" },
-        { title: "Spec2", creationDate: "2019-11-11" },
+        { title: "Spec1", audience: "Some audience", intendedUse: "some use", creationDate: "2019-10-10" },
+        { title: "Spec2", audience: "Some audience", intendedUse: "some use", creationDate: "2019-11-11" },
+        { title: "Spec2", audience: "Some audience", intendedUse: "some use", creationDate: "2019-11-11" },
     ];
     const classes = useStyles();
+    const [showSpecModal, setShowSpecModal] = useState(false);
+    const [selectedSpec, setSelectedSpec] = useState(specifications[0]);
 
-    const specComponents = specifications.map(spec => (
-        <Grid item>
-            <Specification title={spec.title} creationDate={spec.creationDate} />
-        </Grid>
+    const openSpecModal = (index: number) => {
+        setSelectedSpec(specifications[index]);
+        setShowSpecModal(true);
+    }
+    const closeSpecModal = () => { setShowSpecModal(false); }
+
+    const specComponents = specifications.map((spec, index) => (
+        <div onClick={() => openSpecModal(index)}>
+            <Grid item>
+                <Specification title={spec.title} creationDate={spec.creationDate} />
+            </Grid>
+        </div>
     ));
 
     return (
-        <Grid className={classes.grid} container justify="center" spacing={4}>
-            {specComponents}
-        </Grid>
+        <div>
+            <Grid className={classes.grid} container justify="center" spacing={4}>
+                {specComponents}
+            </Grid>
+            <SpecificationModal title={selectedSpec.title}
+                audience={selectedSpec.audience}
+                intendedUse={selectedSpec.intendedUse}
+                open={showSpecModal}
+                onClose={closeSpecModal} />
+        </div>
     )
 }
 
