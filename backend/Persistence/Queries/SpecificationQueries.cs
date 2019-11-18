@@ -55,7 +55,10 @@ namespace Persistence.Queries
 
         public Task<Specification> FetchByIdAsync(int id)
         {
-            return _context.Specifications.FirstOrDefaultAsync(s => s.Id == id);
+            return _context.Specifications
+                .Include(spec => spec.FunctionalRequirements)
+                .Include(spec => spec.NonFunctionalRequirements)
+                .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public Task<bool> Exists(int id)

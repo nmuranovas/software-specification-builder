@@ -102,7 +102,7 @@ const Specifications = (props: RouteComponentProps) => {
 
     const specModal = selectedSpec !== undefined ? (
         <SpecificationModal
-            specification={selectedSpec}
+            specificationId={selectedSpec.id}
             open={showSpecModal}
             onClose={closeSpecModal}
         />

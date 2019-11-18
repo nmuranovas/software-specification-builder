@@ -4,6 +4,7 @@ type SpecRequirement = {
 }
 
 type SpecificationModel = {
+    id: number,
     title: string,
     audience: string,
     intendedUse: string,
