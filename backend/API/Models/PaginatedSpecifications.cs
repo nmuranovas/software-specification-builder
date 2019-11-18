@@ -5,7 +5,7 @@ namespace API.Models
 {
     public class PaginatedSpecifications
     {
-        public IEnumerable<Specification> Specifications { get; set; }
+        public IEnumerable<ShortenedSpecification> ShortenedSpecifications { get; set; }
         public int TotalPageCount { get; set; }
     }
 }

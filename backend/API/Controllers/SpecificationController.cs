@@ -40,6 +40,37 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet, Route("/api/[controller]/search")]
+        public async Task<ActionResult<IEnumerable<ShortenedSpecification>>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
+        {
+            SpecificationOrderOptions orderOption;
+            switch (sortByTerm)
+            {
+                case null:
+                case "createdAtDesc":
+                    orderOption = SpecificationOrderOptions.CreatedAtDesc;
+                    break;
+                case "createdAtAsc":
+                    orderOption = SpecificationOrderOptions.CreatedAtAsc;
+                    break;
+                default:
+                    return BadRequest("Sorting term is not valid");
+            }
+
+            var specifications = await _specificationQueries.SearchByTextAsync(searchText, pageNumber, itemCount, orderOption);
+            var shortenedSpecifications = new List<ShortenedSpecification>();
+            foreach (var spec in specifications)
+            {
+                shortenedSpecifications.Add(new ShortenedSpecification
+                {
+                    Id = spec.Id,
+                    CreatedAt = spec.CreatedAt,
+                    Title = spec.Title
+                });
+            }
+            return shortenedSpecifications;
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Specification>> Get(int id)
         {
@@ -54,23 +85,23 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{pageNumber}/{itemCount}")]
-        public ActionResult<PaginatedSpecifications> Get(int pageNumber = 0, int itemCount = 10)
-        {
-            var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, itemCount);
-            var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
+        //[HttpGet("{pageNumber}/{itemCount}")]
+        //public ActionResult<PaginatedSpecifications> Get(int pageNumber = 0, int itemCount = 10)
+        //{
+        //    var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, itemCount);
+        //    var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
 
-            var totalPageCount = totalSpecificationCount / itemCount;
+        //    var totalPageCount = totalSpecificationCount / itemCount;
 
-            return new PaginatedSpecifications
-            {
-                Specifications = specifications,
-                TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
-            };
-        }
+        //    return new PaginatedSpecifications
+        //    {
+        //        Specifications = specifications,
+        //        TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
+        //    };
+        //}
 
-        [HttpGet("{pageNumber}/{itemCount}/{sortByTerm}")]
-        public ActionResult<PaginatedSpecifications> Get(int pageNumber = 0, int itemCount = 10, string sortByTerm = null)
+        [HttpGet]
+        public ActionResult<PaginatedSpecifications> Get([FromQuery]int pageNumber = 0, [FromQuery]int itemCount = 10, [FromQuery]string sortByTerm = null)
         {
             SpecificationOrderOptions orderOption;
             switch (sortByTerm)
@@ -87,17 +118,26 @@ namespace API.Controllers
             }
 
             var specifications = _specificationQueries.FindAllByPageNumberAndSizeOrderedBy(pageNumber, itemCount, orderOption);
-            var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
+            var shortenedSpecifications = new List<ShortenedSpecification>();
+            foreach (var spec in specifications)
+            {
+                shortenedSpecifications.Add(new ShortenedSpecification
+                {
+                    Id = spec.Id,
+                    CreatedAt = spec.CreatedAt,
+                    Title = spec.Title
+                });
+            }
 
+            var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
             var totalPageCount = totalSpecificationCount / itemCount;
 
             return new PaginatedSpecifications
             {
-                Specifications = specifications,
+                ShortenedSpecifications = shortenedSpecifications,
                 TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
             };
         }
-
 
         [HttpPost]
         public async Task<ActionResult<Specification>> Post(Specification specification)

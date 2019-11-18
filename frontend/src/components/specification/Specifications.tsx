@@ -3,11 +3,11 @@ import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import Specification from './Specification';
 import SpecificationModal from './SpecificationModal';
-import { useParams, RouteComponentProps } from 'react-router-dom'
-import Axios from 'axios';
-import SpecificationModel from '../../models/Specification';
+import Axios, { AxiosResponse } from 'axios';
+import { ShortenedSpecificationModel } from '../../models/Specification';
 import DottedSpinner from '../spinners/DottedSpinner';
 import SlickPagination from '../pagination/SlickPagination';
+import SearchBar from './SearchBar';
 
 const useStyles = makeStyles(theme => ({
     grid: {
@@ -33,36 +33,59 @@ const useStyles = makeStyles(theme => ({
     },
     expandOpen: {
         transform: 'rotate(180deg)'
-    }
+    },
+
 }));
 
 
-const Specifications = (props: RouteComponentProps) => {
-    const [specs, setSpecs] = useState<SpecificationModel[]>();
+const Specifications = () => {
+    const [specs, setSpecs] = useState<ShortenedSpecificationModel[]>();
 
     const [totalPageCount, setTotalPageCount] = useState(0)
-    const [itemsPerPage, setItemsPerPage] = useState(2)
+    const [itemsPerPage] = useState(2)
     const [currentPage, setCurrentPage] = useState(0);
+    const [searchString, setSearchString] = useState<string>()
 
     const [isLoading, setIsLoading] = useState(true);
     const classes = useStyles();
     const [showSpecModal, setShowSpecModal] = useState(false);
-    const [selectedSpec, setSelectedSpec] = useState<SpecificationModel>();
+    const [selectedSpec, setSelectedSpec] = useState<ShortenedSpecificationModel>();
 
     const [orderBy, setOrderBy] = useState<string>("createdAtDesc")
 
     useEffect(() => {
-        Axios.get(`/api/specification/${currentPage}/${itemsPerPage}/${orderBy}`)
-            .then(res => {
-                setSpecs(res.data.specifications)
-                setTotalPageCount(res.data.totalPageCount)
+        let promise: Promise<AxiosResponse<any>>;
+        if (searchString === undefined) {
+            promise = Axios.get('/api/specification', {
+                params: {
+                    pageNumber: currentPage,
+                    itemCount: itemsPerPage,
+                    sortByTerm: orderBy
+                }
             })
+        } else {
+            promise = Axios.get(`/api/specification/search`, {
+                params: {
+                    searchText: searchString,
+                    pageNumber: currentPage,
+                    itemCount: itemsPerPage,
+                    sortByTerm: orderBy
+                }
+            })
+        }
+        console.log(promise)
+
+        promise.then(res => {
+            console.log(res)
+            setSpecs(res.data.shortenedSpecifications)
+            setTotalPageCount(res.data.totalPageCount)
+        })
             .catch(err => {
                 console.log(err)
             }).finally(() => {
                 setIsLoading(false);
             });
-    }, [currentPage, orderBy]);
+    }, [currentPage, orderBy, searchString]);
 
     // useEffect(() => {
     //     if (specs != null) {
@@ -70,6 +93,10 @@ const Specifications = (props: RouteComponentProps) => {
     //         setShowSpecModal(true);
     //     }
     // }, [specs])
+
+    const handleSearchSubmit = (searchString: string) => {
+        setSearchString(searchString)
+    }
 
     if (isLoading) {
         return <DottedSpinner color="black" />
@@ -100,6 +127,8 @@ const Specifications = (props: RouteComponentProps) => {
         setOrderBy(orderTerm)
     }
 
+
+
     const specModal = selectedSpec !== undefined ? (
         <SpecificationModal
             specificationId={selectedSpec.id}
@@ -110,17 +139,18 @@ const Specifications = (props: RouteComponentProps) => {
 
     return (
         <div>
+            <SearchBar onSubmit={handleSearchSubmit} />
+            <Grid className={classes.grid} container justify="center" spacing={4}>
+                {specComponents}
+            </Grid>
             <SlickPagination pageCount={totalPageCount}
                 currentPage={currentPage}
                 onPageChanged={handlePageChange}
                 orderChanged={handleOrderChange}
                 currentOrderTerm={orderBy}
             />
-            <Grid className={classes.grid} container justify="center" spacing={4}>
-                {specComponents}
-            </Grid>
             {specModal}
-        </div>
+        </div >
     )
 }
 

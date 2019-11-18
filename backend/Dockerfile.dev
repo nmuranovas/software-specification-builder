@@ -2,6 +2,10 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.0 as build-env
 
 ENV DOTNET_USE_POLLING_FILE_WATCHER 1
 
+# Install unzip for remote debugger
+RUN apt-get update
+RUN apt-get install unzip
+
 WORKDIR /app
 
 COPY ["./Software Specification Builder.sln", "./"]

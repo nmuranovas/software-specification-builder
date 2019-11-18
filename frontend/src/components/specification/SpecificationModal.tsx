@@ -23,7 +23,6 @@ type SpecificationModalProps = {
 
 const SpecificationModal = (props: SpecificationModalProps) => {
     const [specification, setSpecification] = useState<SpecificationModel>()
-    
     useEffect(() => {
         Axios.get(`/api/specification/${props.specificationId}`)
             .then(response => {
@@ -33,7 +32,7 @@ const SpecificationModal = (props: SpecificationModalProps) => {
             })
         return () => {
         };
-    }, [props.specificationId, specification])
+    }, [props.specificationId])
 
     const styles = useStyles();
 

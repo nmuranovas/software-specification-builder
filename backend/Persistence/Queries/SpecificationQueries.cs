@@ -48,6 +48,26 @@ namespace Persistence.Queries
             };
         }
 
+        public async Task<IEnumerable<Specification>> SearchByTextAsync(string searchText, int pageNumber, int itemCount, SpecificationOrderOptions orderOption)
+        {
+            var query = _context.Specifications.Where(spec =>
+                spec.Title.ToLower().Contains(searchText.ToLower()));
+            switch (orderOption)
+            {
+                case SpecificationOrderOptions.CreatedAtAsc:
+                    query = query.OrderBy(spec => spec.CreatedAt);
+                    break;
+                case SpecificationOrderOptions.CreatedAtDesc:
+                    query = query.OrderByDescending(spec => spec.CreatedAt);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(orderOption), orderOption, null);
+            }
+
+            return await query.Skip(pageNumber * itemCount)
+                .Take(itemCount).ToListAsync();
+        }
+
         public int GetTotalSpecificationCount()
         {
             return _context.Specifications.Count();

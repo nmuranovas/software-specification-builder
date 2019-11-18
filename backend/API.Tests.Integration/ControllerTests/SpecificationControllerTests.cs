@@ -143,12 +143,12 @@ namespace API.Tests.Integration.ControllerTests
             context.Specifications.AddRange(dummySpecs);
             context.SaveChanges();
 
-            var result = specificationController.Get("createdAtAsc", 0, 2);
+            var result = specificationController.Get(0, 2, "createdAtAsc");
             var specifications = result.Value.Specifications.ToList();
 
             Assert.True(specifications.First().CreatedAt < specifications.Last().CreatedAt);
-        }        
-        
+        }
+
         [Fact]
         public async Task GetShouldReturn2SpecificationsOrderedByDescendingDate()
         {
@@ -165,10 +165,30 @@ namespace API.Tests.Integration.ControllerTests
             context.Specifications.AddRange(dummySpecs);
             context.SaveChanges();
 
-            var result = specificationController.Get("createdAtDesc", 0, 2);
+            var result = specificationController.Get(0, 2, "createdAtDesc");
             var specifications = result.Value.Specifications.ToList();
 
             Assert.True(specifications.First().CreatedAt > specifications.Last().CreatedAt);
+        }
+
+        [Fact]
+        public async Task SearchShouldReturnSpecificationContainingSameSearchWord()
+        {
+            await using var context = InMemorySpecificationContextFactory.CreateInMemorySpecificationContext();
+            var specificationQueries = new SpecificationQueries(context);
+            var specificationController = new SpecificationController(null, specificationQueries);
+
+            var dummySpecs = new List<Specification>
+            {
+                new Specification {Title = "SearchWord"},
+                new Specification()
+            };
+            context.Specifications.AddRange(dummySpecs);
+            context.SaveChanges();
+
+            var result = await specificationController.Search("searchword");
+
+            Assert.Equal("SearchWord", result.Value.First().Title);
         }
     }
 }

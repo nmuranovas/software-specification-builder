@@ -14,4 +14,10 @@ type SpecificationModel = {
     lastModified: Date
 }
 
+export type ShortenedSpecificationModel = {
+    id: number,
+    title: string,
+    createdAt: Date
+}
+
 export default SpecificationModel;
