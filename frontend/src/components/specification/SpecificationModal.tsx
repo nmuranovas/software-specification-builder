@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
 type SpecificationModalProps = {
     open: boolean,
     onClose: () => void,
-    specification: SpecificationModel
+    specification: SpecificationModel,
 }
 
 const SpecificationModal = (props: SpecificationModalProps) => {

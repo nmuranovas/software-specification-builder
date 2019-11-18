@@ -55,7 +55,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{pageNumber}/{itemCount}")]
-        public ActionResult<PaginatedSpecifications> Get(int pageNumber, int itemCount)
+        public ActionResult<PaginatedSpecifications> Get(int pageNumber = 0, int itemCount = 10)
         {
             var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, itemCount);
             var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
@@ -68,6 +68,36 @@ namespace API.Controllers
                 TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
             };
         }
+
+        [HttpGet("{pageNumber}/{itemCount}/{sortByTerm}")]
+        public ActionResult<PaginatedSpecifications> Get(int pageNumber = 0, int itemCount = 10, string sortByTerm = null)
+        {
+            SpecificationOrderOptions orderOption;
+            switch (sortByTerm)
+            {
+                case null:
+                case "createdAtDesc":
+                    orderOption = SpecificationOrderOptions.CreatedAtDesc;
+                    break;
+                case "createdAtAsc":
+                    orderOption = SpecificationOrderOptions.CreatedAtAsc;
+                    break;
+                default:
+                    return BadRequest("Sorting term is not valid");
+            }
+
+            var specifications = _specificationQueries.FindAllByPageNumberAndSizeOrderedBy(pageNumber, itemCount, orderOption);
+            var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
+
+            var totalPageCount = totalSpecificationCount / itemCount;
+
+            return new PaginatedSpecifications
+            {
+                Specifications = specifications,
+                TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
+            };
+        }
+
 
         [HttpPost]
         public async Task<ActionResult<Specification>> Post(Specification specification)

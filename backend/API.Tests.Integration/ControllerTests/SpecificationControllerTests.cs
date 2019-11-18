@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API.Controllers;
 using API.Tests.Integration.Helpers;
@@ -114,7 +116,7 @@ namespace API.Tests.Integration.ControllerTests
             var specificationQueries = new SpecificationQueries(context);
             var specificationController = new SpecificationController(null, specificationQueries);
 
-            var dummySpecs = Enumerable.Range(0, 5).Select(num => new Specification{Title = num.ToString()}).ToList();
+            var dummySpecs = Enumerable.Range(0, 5).Select(num => new Specification { Title = num.ToString() }).ToList();
             context.Specifications.AddRange(dummySpecs);
             context.SaveChanges();
 
@@ -123,6 +125,50 @@ namespace API.Tests.Integration.ControllerTests
 
             Assert.Equal(dummySpecs[2].Title, specifications[0].Title);
             Assert.Equal(dummySpecs[3].Title, specifications[1].Title);
+        }
+
+        [Fact]
+        public async Task GetShouldReturn2SpecificationsOrderedByAscendingDate()
+        {
+            await using var context = InMemorySpecificationContextFactory.CreateInMemorySpecificationContext();
+            var specificationQueries = new SpecificationQueries(context);
+            var specificationController = new SpecificationController(null, specificationQueries);
+
+            var dummySpecs = new List<Specification>
+                {
+                    new Specification {CreatedAt = DateTime.MinValue},
+                    new Specification {CreatedAt = DateTime.MaxValue}
+
+                };
+            context.Specifications.AddRange(dummySpecs);
+            context.SaveChanges();
+
+            var result = specificationController.Get("createdAtAsc", 0, 2);
+            var specifications = result.Value.Specifications.ToList();
+
+            Assert.True(specifications.First().CreatedAt < specifications.Last().CreatedAt);
+        }        
+        
+        [Fact]
+        public async Task GetShouldReturn2SpecificationsOrderedByDescendingDate()
+        {
+            await using var context = InMemorySpecificationContextFactory.CreateInMemorySpecificationContext();
+            var specificationQueries = new SpecificationQueries(context);
+            var specificationController = new SpecificationController(null, specificationQueries);
+
+            var dummySpecs = new List<Specification>
+                {
+                    new Specification {CreatedAt = DateTime.MinValue},
+                    new Specification {CreatedAt = DateTime.MaxValue}
+
+                };
+            context.Specifications.AddRange(dummySpecs);
+            context.SaveChanges();
+
+            var result = specificationController.Get("createdAtDesc", 0, 2);
+            var specifications = result.Value.Specifications.ToList();
+
+            Assert.True(specifications.First().CreatedAt > specifications.Last().CreatedAt);
         }
     }
 }

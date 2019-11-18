@@ -38,38 +38,38 @@ const useStyles = makeStyles(theme => ({
 
 
 const Specifications = (props: RouteComponentProps) => {
-    const { page, count } = useParams();
     const [specs, setSpecs] = useState<SpecificationModel[]>();
 
     const [totalPageCount, setTotalPageCount] = useState(0)
-    const [currentPage, setCurrentPage] = useState();
+    const [itemsPerPage, setItemsPerPage] = useState(2)
+    const [currentPage, setCurrentPage] = useState(0);
 
     const [isLoading, setIsLoading] = useState(true);
     const classes = useStyles();
     const [showSpecModal, setShowSpecModal] = useState(false);
     const [selectedSpec, setSelectedSpec] = useState<SpecificationModel>();
 
+    const [orderBy, setOrderBy] = useState<string>("createdAtDesc")
+
     useEffect(() => {
-        Axios.get(`/api/specification/${page}/${count}`)
+        Axios.get(`/api/specification/${currentPage}/${itemsPerPage}/${orderBy}`)
             .then(res => {
                 setSpecs(res.data.specifications)
                 setTotalPageCount(res.data.totalPageCount)
-                if (page !== undefined)
-                    setCurrentPage(parseInt(page));
             })
             .catch(err => {
                 console.log(err)
             }).finally(() => {
                 setIsLoading(false);
             });
-    }, [page]);
+    }, [currentPage, orderBy]);
 
-    useEffect(() => {
-        if (specs != null) {
-            setSelectedSpec(specs[specs.length - 1])
-            setShowSpecModal(true);
-        }
-    }, [specs])
+    // useEffect(() => {
+    //     if (specs != null) {
+    //         setSelectedSpec(specs[specs.length - 1])
+    //         setShowSpecModal(true);
+    //     }
+    // }, [specs])
 
     if (isLoading) {
         return <DottedSpinner color="black" />
@@ -85,7 +85,7 @@ const Specifications = (props: RouteComponentProps) => {
     const closeSpecModal = () => { setShowSpecModal(false); }
 
     const handlePageChange = (pageNumber: number) => {
-        props.history.push(`/specifications/${pageNumber}/${count}`)
+        setCurrentPage(pageNumber)
     }
 
     const specComponents = specs.map((spec, index) => (
@@ -96,23 +96,26 @@ const Specifications = (props: RouteComponentProps) => {
         </div>
     ));
 
+    const handleOrderChange = (orderTerm: string) => {
+        setOrderBy(orderTerm)
+    }
+
     const specModal = selectedSpec !== undefined ? (
         <SpecificationModal
             specification={selectedSpec}
             open={showSpecModal}
-            onClose={closeSpecModal} />
-        // <SpecificationModal title={selectedSpec.title}
-        //     audience={selectedSpec.audience}
-        //     intendedUse={selectedSpec.intendedUse}
-        //     open={showSpecModal}
-        //     onClose={closeSpecModal} />
+            onClose={closeSpecModal}
+        />
     ) : null;
 
     return (
         <div>
             <SlickPagination pageCount={totalPageCount}
                 currentPage={currentPage}
-                onPageChanged={handlePageChange} />
+                onPageChanged={handlePageChange}
+                orderChanged={handleOrderChange}
+                currentOrderTerm={orderBy}
+            />
             <Grid className={classes.grid} container justify="center" spacing={4}>
                 {specComponents}
             </Grid>

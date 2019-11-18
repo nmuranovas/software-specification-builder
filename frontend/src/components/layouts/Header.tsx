@@ -56,7 +56,7 @@ export default function Header() {
                 </Button>
                 {profileLink}
                 <Button>
-                    <Link to="/specifications/0/10">Specifications</Link>
+                    <Link to="/specifications">Specifications</Link>
                 </Button>
                 <Button>
                     <Link to="/specification-builder">Builder</Link>

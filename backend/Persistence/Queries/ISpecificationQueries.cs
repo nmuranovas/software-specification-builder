@@ -10,5 +10,6 @@ namespace Persistence.Queries
         Task<Specification> FetchByIdAsync(int id);
         IEnumerable<Specification> FindAllByPageNumberAndSize(int pageNumber, int pageSize);
         int GetTotalSpecificationCount();
+        IEnumerable<Specification> FindAllByPageNumberAndSizeOrderedBy(int pageNumber, int pageSize, SpecificationOrderOptions orderOptions);
     }
 }
