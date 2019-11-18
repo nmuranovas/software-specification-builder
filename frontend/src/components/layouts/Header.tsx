@@ -49,7 +49,7 @@ export default function Header() {
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" className={classes.title}>
-                    News
+                    <Link to="/">Specification Builder</Link>
                 </Typography>
                 <Button>
                     <Link to="/">Home</Link>

@@ -17,6 +17,7 @@ h1 {
   position: relative;
 }
 .pagination a {
+  margin: 0 2px;
   position: relative;
   display: inline-block;
   color: #2c3e50;

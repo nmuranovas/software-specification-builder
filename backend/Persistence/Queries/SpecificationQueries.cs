@@ -19,7 +19,10 @@ namespace Persistence.Queries
 
         public IEnumerable<Specification> FindAllByPageNumberAndSize(int pageNumber, int pageSize)
         {
-            return _context.Specifications.Skip(pageNumber * pageSize).Take(pageSize);
+            return _context.Specifications
+                .Include(spec => spec.FunctionalRequirements)
+                .Include(spec => spec.NonFunctionalRequirements)
+                .Skip(pageNumber * pageSize).Take(pageSize);
         }
 
         public int GetTotalSpecificationCount()

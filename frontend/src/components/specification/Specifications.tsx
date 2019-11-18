@@ -64,6 +64,13 @@ const Specifications = (props: RouteComponentProps) => {
             });
     }, [page]);
 
+    useEffect(() => {
+        if (specs != null) {
+            setSelectedSpec(specs[specs.length - 1])
+            setShowSpecModal(true);
+        }
+    }, [specs])
+
     if (isLoading) {
         return <DottedSpinner color="black" />
     } else if (specs === undefined) {
@@ -74,6 +81,7 @@ const Specifications = (props: RouteComponentProps) => {
         setSelectedSpec(specs[index]);
         setShowSpecModal(true);
     }
+
     const closeSpecModal = () => { setShowSpecModal(false); }
 
     const handlePageChange = (pageNumber: number) => {
@@ -89,18 +97,22 @@ const Specifications = (props: RouteComponentProps) => {
     ));
 
     const specModal = selectedSpec !== undefined ? (
-        <SpecificationModal title={selectedSpec.title}
-            audience={selectedSpec.audience}
-            intendedUse={selectedSpec.intendedUse}
+        <SpecificationModal
+            specification={selectedSpec}
             open={showSpecModal}
             onClose={closeSpecModal} />
+        // <SpecificationModal title={selectedSpec.title}
+        //     audience={selectedSpec.audience}
+        //     intendedUse={selectedSpec.intendedUse}
+        //     open={showSpecModal}
+        //     onClose={closeSpecModal} />
     ) : null;
 
     return (
         <div>
             <SlickPagination pageCount={totalPageCount}
                 currentPage={currentPage}
-                onPageChanged={handlePageChange}/>
+                onPageChanged={handlePageChange} />
             <Grid className={classes.grid} container justify="center" spacing={4}>
                 {specComponents}
             </Grid>

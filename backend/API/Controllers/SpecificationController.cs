@@ -60,10 +60,12 @@ namespace API.Controllers
             var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, itemCount);
             var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
 
+            var totalPageCount = totalSpecificationCount / itemCount;
+
             return new PaginatedSpecifications
             {
                 Specifications = specifications,
-                TotalPageCount = totalSpecificationCount / itemCount
+                TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
             };
         }
 

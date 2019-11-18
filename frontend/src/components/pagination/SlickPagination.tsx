@@ -18,7 +18,7 @@ const SlickPagination = (props: SlickPaginationProps) => {
         );
     }
 
-    const isLastPage = props.currentPage === props.pageCount - 1;
+    const isLastPage = props.currentPage >= props.pageCount - 1;
 
     const handleNextClick = () => {
         if (isLastPage) {
