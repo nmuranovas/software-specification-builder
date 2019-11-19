@@ -11,6 +11,7 @@ import { fetchPaginatedSpecifications, fetchPaginatedSpecificationsWithSearch } 
 import { PaginatedSpecificationResponse } from '../../services/response-models/PaginatedSpecificationResponse';
 import { OrderingOptions } from '../../models/OrderingOptions';
 import DateFilter from './DateFilter';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles(theme => ({
     grid: {
@@ -110,6 +111,11 @@ const Specifications = () => {
                     onClose={closeSpecModal}
                 />
             )}
+            <Skeleton variant="rect" width={210} height={118} />
+            <React.Fragment>
+              <Skeleton />
+              <Skeleton width="60%" />
+            </React.Fragment>
         </div >
     )
 }

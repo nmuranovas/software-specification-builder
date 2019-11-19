@@ -20,6 +20,10 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         title: {
             flexGrow: 1,
+        },
+        unstyledLink: {
+            color: theme.palette.text.primary,
+            textDecoration: 'none'
         }
     })
 );
@@ -35,31 +39,28 @@ export default function Header() {
             <Button onClick={() => loginWithRedirect()} color="inherit">Login</Button>
         );
 
-    const profileLink = isAuthenticated ?
-        (
-            <Button>
-                <Link to="/profile">Profile</Link>
-            </Button>
-        ) : null;
-
     return (
-        <AppBar position="static">
+        <AppBar position="static" color="default">
             <Toolbar>
-                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                <IconButton edge="start" className={classes.menuButton} color="default" aria-label="menu">
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" className={classes.title}>
-                    <Link to="/">Specification Builder</Link>
+                    <Link className={classes.unstyledLink} to="/">Specification Builder</Link>
                 </Typography>
                 <Button>
-                    <Link to="/">Home</Link>
+                    <Link className={classes.unstyledLink} to="/">Home</Link>
                 </Button>
-                {profileLink}
+                {isAuthenticated && (
+                    <Button>
+                        <Link to="/profile">Profile</Link>
+                    </Button>
+                )}
                 <Button>
-                    <Link to="/specifications">Specifications</Link>
+                    <Link className={classes.unstyledLink} to="/specifications">Specifications</Link>
                 </Button>
                 <Button>
-                    <Link to="/specification-builder">Builder</Link>
+                    <Link className={classes.unstyledLink} to="/specification-builder">Builder</Link>
                 </Button>
                 {loginLogoutButtons}
             </Toolbar>

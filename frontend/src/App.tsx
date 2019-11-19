@@ -10,10 +10,19 @@ import Footer from './components/layouts/Footer';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Specifications from './components/specification/Specifications';
 import SpecificationBuilder from './components/specification-builder/SpecificationBuilder';
+import SpecificationDetailsComponent from './components/dedicated-specification-page/SpecificationDetailsComponent';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { CssBaseline } from '@material-ui/core';
 
 const App: React.FunctionComponent = () => {
-
   const { isLoggingIn } = useAuth0();
+
+  const theme = createMuiTheme({
+    palette: {
+      type: 'dark',
+    },
+  });
 
   if (isLoggingIn) {
     return <div>Loading...</div>
@@ -21,16 +30,20 @@ const App: React.FunctionComponent = () => {
 
   return (
     <div>
-      <BrowserRouter>
-        <Header />
-        <Switch>
-          <Route path="/specification-builder" component={SpecificationBuilder} />
-          <Route path="/specifications" component={Specifications} />
-          <Route path="/" exact component={Home} />
-          <PrivateRoute path="/profile" Component={Profile} />
-        </Switch>
-        <Footer />
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrowserRouter>
+          <Header />
+          <Switch>
+            <Route path="/specification/:id" component={SpecificationDetailsComponent} />
+            <Route path="/specification-builder" component={SpecificationBuilder} />
+            <Route path="/specifications" component={Specifications} />
+            <Route path="/" exact component={Home} />
+            <PrivateRoute path="/profile" Component={Profile} />
+          </Switch>
+          <Footer />
+        </BrowserRouter>
+      </ThemeProvider>
     </div>
   );
 }
