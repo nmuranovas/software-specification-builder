@@ -1,4 +1,4 @@
-import { Grid, FormControl, InputLabel, FilledInput, InputAdornment, Container, Paper, InputBase, IconButton, Divider, Box, TextField } from '@material-ui/core'
+import { Paper, InputBase, IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useState } from 'react'
@@ -18,7 +18,7 @@ type SearchBarProps = {
 }
 
 const SearchBar = (props: SearchBarProps) => {
-    const [searchValue, setSearchValue] = useState<string>();
+    const [searchValue, setSearchValue] = useState<string>("");
     const classes = useStyles();
 
     const handleValueChange = (value: string) => {
@@ -32,17 +32,15 @@ const SearchBar = (props: SearchBarProps) => {
     }
 
     return (
-        <Box display="flex" justifyContent="center">
-            <Paper className={classes.searchBarPaper}>
-                <InputBase className={classes.searchInput}
-                    value={searchValue}
-                    onChange={event => handleValueChange(event.target.value)}
-                    placeholder="" />
-                <IconButton type="submit" onClick={handleSubmit}>
-                    <SearchIcon />
-                </IconButton>
-            </Paper>
-        </Box>
+        <Paper className={classes.searchBarPaper}>
+            <InputBase className={classes.searchInput}
+                value={searchValue}
+                onChange={event => handleValueChange(event.target.value)}
+                placeholder="" />
+            <IconButton type="submit" onClick={handleSubmit}>
+                <SearchIcon />
+            </IconButton>
+        </Paper>
     )
 }
 

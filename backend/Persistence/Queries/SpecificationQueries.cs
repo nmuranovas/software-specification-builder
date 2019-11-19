@@ -48,7 +48,7 @@ namespace Persistence.Queries
             };
         }
 
-        public async Task<IEnumerable<Specification>> SearchByTextAsync(string searchText, int pageNumber, int itemCount, SpecificationOrderOptions orderOption)
+        public async Task<IReadOnlyCollection<Specification>> SearchByTextAsync(string searchText, int pageNumber, int itemCount, SpecificationOrderOptions orderOption)
         {
             var query = _context.Specifications.Where(spec =>
                 spec.Title.ToLower().Contains(searchText.ToLower()));
@@ -66,6 +66,14 @@ namespace Persistence.Queries
 
             return await query.Skip(pageNumber * itemCount)
                 .Take(itemCount).ToListAsync();
+        }
+
+        public Task<int> CountSpecificationsThatMatchText(string searchText)
+        {
+            var query = _context.Specifications.Where(spec =>
+                spec.Title.ToLower().Contains(searchText.ToLower()));
+
+            return query.CountAsync();
         }
 
         public int GetTotalSpecificationCount()

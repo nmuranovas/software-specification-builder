@@ -1,44 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import { Grid } from '@material-ui/core'
+import { Grid, Box } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import Specification from './Specification';
-import SpecificationModal from './SpecificationModal';
-import Axios, { AxiosResponse } from 'axios';
+import SpecificationModal from '../modals/SpecificationModal';
 import { ShortenedSpecificationModel } from '../../models/Specification';
 import DottedSpinner from '../spinners/DottedSpinner';
 import SlickPagination from '../pagination/SlickPagination';
 import SearchBar from './SearchBar';
+import { fetchPaginatedSpecifications, fetchPaginatedSpecificationsWithSearch } from '../../services/BackendAPI';
+import { PaginatedSpecificationResponse } from '../../services/response-models/PaginatedSpecificationResponse';
+import { OrderingOptions } from '../../models/OrderingOptions';
+import DateFilter from './DateFilter';
 
 const useStyles = makeStyles(theme => ({
     grid: {
         margin: theme.spacing(1, 1)
-    },
-    media: {
-        height: 0,
-        paddingTop: '56.25%', // 16:9
-    },
-    paper: {
-        height: 140,
-        width: 100
-    },
-    card: {
-        maxWidth: 345
-    },
-    expand: {
-        transform: 'rotate(0deg)',
-        marginLeft: 'auto',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest
-        })
-    },
-    expandOpen: {
-        transform: 'rotate(180deg)'
-    },
-
+    }
 }));
 
-
 const Specifications = () => {
+    const classes = useStyles();
     const [specs, setSpecs] = useState<ShortenedSpecificationModel[]>();
 
     const [totalPageCount, setTotalPageCount] = useState(0)
@@ -47,44 +28,32 @@ const Specifications = () => {
     const [searchString, setSearchString] = useState<string>()
 
     const [isLoading, setIsLoading] = useState(true);
-    const classes = useStyles();
     const [showSpecModal, setShowSpecModal] = useState(false);
-    const [selectedSpec, setSelectedSpec] = useState<ShortenedSpecificationModel>();
+    const [selectedSpecId, setSelectedSpecId] = useState<number>();
 
-    const [orderBy, setOrderBy] = useState<string>("createdAtDesc")
+    const [orderBy, setOrderBy] = useState<OrderingOptions>(OrderingOptions.CreatedAtDesc)
 
     useEffect(() => {
-        let promise: Promise<AxiosResponse<any>>;
-        if (searchString === undefined) {
-            promise = Axios.get('/api/specification', {
-                params: {
-                    pageNumber: currentPage,
-                    itemCount: itemsPerPage,
-                    sortByTerm: orderBy
+        setIsLoading(true);
+        const fetchData = async () => {
+            try {
+                let promise: Promise<PaginatedSpecificationResponse>;
+                if (searchString === undefined || searchString === "") {
+                    promise = fetchPaginatedSpecifications(currentPage, itemsPerPage, orderBy);
+                } else {
+                    promise = fetchPaginatedSpecificationsWithSearch(searchString, currentPage, itemsPerPage, orderBy);
                 }
-            })
-        } else {
-            promise = Axios.get(`/api/specification/search`, {
-                params: {
-                    searchText: searchString,
-                    pageNumber: currentPage,
-                    itemCount: itemsPerPage,
-                    sortByTerm: orderBy
-                }
-            })
-        }
-        console.log(promise)
-
-        promise.then(res => {
-            console.log(res)
-            setSpecs(res.data.shortenedSpecifications)
-            setTotalPageCount(res.data.totalPageCount)
-        })
-            .catch(err => {
-                console.log(err)
-            }).finally(() => {
+                const response = await promise;
+                setSpecs(response.shortenedSpecifications)
+                setTotalPageCount(response.totalPageCount)
+            } catch (error) {
+                console.log(error)
+            } finally {
                 setIsLoading(false);
-            });
+            }
+        }
+
+        fetchData();
     }, [currentPage, orderBy, searchString]);
 
     // useEffect(() => {
@@ -94,62 +63,53 @@ const Specifications = () => {
     //     }
     // }, [specs])
 
-    const handleSearchSubmit = (searchString: string) => {
-        setSearchString(searchString)
-    }
-
-    if (isLoading) {
-        return <DottedSpinner color="black" />
-    } else if (specs === undefined) {
-        return <div>No specs found</div>
-    }
-
-    const openSpecModal = (index: number) => {
-        setSelectedSpec(specs[index]);
+    const openSpecModal = (id: number) => {
+        setSelectedSpecId(id);
         setShowSpecModal(true);
     }
-
     const closeSpecModal = () => { setShowSpecModal(false); }
 
-    const handlePageChange = (pageNumber: number) => {
-        setCurrentPage(pageNumber)
+    const handlePageChange = (pageNumber: number) => { setCurrentPage(pageNumber) }
+    const handleOrderChange = (orderTerm: OrderingOptions) => { setOrderBy(orderTerm) }
+    const handleSearchSubmit = (searchString: string) => { setCurrentPage(0); setSearchString(searchString) }
+
+    let mainContent = undefined;
+    if (isLoading) {
+        mainContent = <DottedSpinner color="black" />;
+    } else if (specs === undefined || specs.length === 0) {
+        mainContent = <div>No specs found...</div>
+    } else {
+        mainContent = specs.map(spec => (
+            <div key={spec.id} onClick={() => openSpecModal(spec.id)}>
+                <Grid item>
+                    <Specification title={spec.title} creationDate={spec.createdAt} />
+                </Grid>
+            </div>
+        ))
     }
-
-    const specComponents = specs.map((spec, index) => (
-        <div onClick={() => openSpecModal(index)}>
-            <Grid item>
-                <Specification title={spec.title} creationDate={spec.createdAt} />
-            </Grid>
-        </div>
-    ));
-
-    const handleOrderChange = (orderTerm: string) => {
-        setOrderBy(orderTerm)
-    }
-
-
-
-    const specModal = selectedSpec !== undefined ? (
-        <SpecificationModal
-            specificationId={selectedSpec.id}
-            open={showSpecModal}
-            onClose={closeSpecModal}
-        />
-    ) : null;
 
     return (
         <div>
-            <SearchBar onSubmit={handleSearchSubmit} />
+            <Box display="flex" justifyContent="center">
+                <SearchBar onSubmit={handleSearchSubmit} />
+                <DateFilter
+                    currentOrderTerm={orderBy}
+                    orderChanged={handleOrderChange} />
+            </Box>
             <Grid className={classes.grid} container justify="center" spacing={4}>
-                {specComponents}
+                {mainContent}
             </Grid>
-            <SlickPagination pageCount={totalPageCount}
+            {specs && specs.length > 0 && <SlickPagination pageCount={totalPageCount}
                 currentPage={currentPage}
                 onPageChanged={handlePageChange}
-                orderChanged={handleOrderChange}
-                currentOrderTerm={orderBy}
-            />
-            {specModal}
+            />}
+            {selectedSpecId && (
+                <SpecificationModal
+                    specificationId={selectedSpecId}
+                    isOpen={showSpecModal}
+                    onClose={closeSpecModal}
+                />
+            )}
         </div >
     )
 }

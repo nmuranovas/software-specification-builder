@@ -4,7 +4,6 @@ import SpecificationInfoForm from './SpecificationInfoForm'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 import ListEditingComponent from './ListEditingComponent';
 import Axios from 'axios';
-import { BackendUrl } from '../../configs/backend-config';
 import DottedSpinner from '../spinners/DottedSpinner';
 import UploadSuccessComponent from './UploadSuccessComponent';
 

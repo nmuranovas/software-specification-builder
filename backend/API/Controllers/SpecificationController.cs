@@ -41,7 +41,7 @@ namespace API.Controllers
         }
 
         [HttpGet, Route("/api/[controller]/search")]
-        public async Task<ActionResult<IEnumerable<ShortenedSpecification>>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
+        public async Task<ActionResult<PaginatedSpecifications>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
         {
             SpecificationOrderOptions orderOption;
             switch (sortByTerm)
@@ -68,7 +68,15 @@ namespace API.Controllers
                     Title = spec.Title
                 });
             }
-            return shortenedSpecifications;
+
+            var totalSpecifications = await _specificationQueries.CountSpecificationsThatMatchText(searchText);
+            var totalPageCount = (totalSpecifications + itemCount - 1) / itemCount;
+
+            return new PaginatedSpecifications
+            {
+                ShortenedSpecifications = shortenedSpecifications,
+                TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
+            };
         }
 
         [HttpGet("{id}")]

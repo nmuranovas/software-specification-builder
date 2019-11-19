@@ -1,9 +1,9 @@
-type SpecRequirement = {
+export type SpecRequirement = {
     description: string,
     orderNumber: number
 }
 
-type SpecificationModel = {
+export type SpecificationModel = {
     id: number,
     title: string,
     audience: string,

@@ -50,7 +50,7 @@ const Specification: React.FunctionComponent<SpecificationProps> = props => {
                 subheader={props.creationDate} />
             <CardMedia
                 className={classes.media}
-                image="/static/images/cards/paella.jpg"
+                image="/React-icon.svg"
                 title="Paella dish"
             />
             <CardContent>

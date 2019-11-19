@@ -30,7 +30,9 @@ interface Auth0ProviderProps extends Auth0ClientOptions {
 export const Auth0Provider = ({
     children,
     onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
-    ...initOptions
+    domain,
+    client_id,
+    redirect_uri
 }: Auth0ProviderProps) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [user, setUser] = useState<any>();
@@ -40,7 +42,7 @@ export const Auth0Provider = ({
 
     useEffect(() => {
         const initAuth0 = async () => {
-            const auth0FromHook = await createAuth0Client(initOptions);
+            const auth0FromHook = await createAuth0Client({domain, client_id, redirect_uri});
             setAuth0Client(auth0FromHook);
 
             if (window.location.search.includes("code=")) {

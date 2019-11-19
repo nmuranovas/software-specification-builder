@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Button } from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import classes from './UploadSuccessComponent.module.css'
 

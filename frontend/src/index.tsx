@@ -7,7 +7,7 @@ import { Auth0Provider } from './services/react-auth0-spa';
 import config from "./auth_config.json";
 
 ReactDOM.render(
-    <Auth0Provider 
+    <Auth0Provider
         domain={config.domain}
         client_id={config.clientId}
         redirect_uri={window.location.origin}>

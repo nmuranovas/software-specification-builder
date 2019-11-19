@@ -12,6 +12,9 @@ namespace Persistence.Queries
         IEnumerable<Specification> FindAllByPageNumberAndSize(int pageNumber, int pageSize);
         int GetTotalSpecificationCount();
         IEnumerable<Specification> FindAllByPageNumberAndSizeOrderedBy(int pageNumber, int pageSize, SpecificationOrderOptions orderOptions);
-        Task<IEnumerable<Specification>> SearchByTextAsync(string searchText, int pageNumber, int itemCount, SpecificationOrderOptions orderOption);
+        Task<IReadOnlyCollection<Specification>> SearchByTextAsync(string searchText, int pageNumber, int itemCount,
+            SpecificationOrderOptions orderOption);
+
+        Task<int> CountSpecificationsThatMatchText(string searchText);
     }
 }
