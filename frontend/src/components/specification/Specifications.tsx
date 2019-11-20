@@ -16,6 +16,9 @@ import Skeleton from '@material-ui/lab/Skeleton';
 const useStyles = makeStyles(theme => ({
     grid: {
         margin: theme.spacing(1, 1)
+    },
+    specificationCard: {
+        margin: theme.spacing(1, 1)
     }
 }));
 
@@ -81,7 +84,7 @@ const Specifications = () => {
         mainContent = <div>No specs found...</div>
     } else {
         mainContent = specs.map(spec => (
-            <div key={spec.id} onClick={() => openSpecModal(spec.slug)}>
+            <div className={classes.specificationCard} key={spec.id} onClick={() => openSpecModal(spec.slug)}>
                 <Grid item>
                     <Specification slug={spec.slug} title={spec.title} creationDate={spec.createdAt} />
                 </Grid>
@@ -113,8 +116,8 @@ const Specifications = () => {
             )}
             <Skeleton variant="rect" width={210} height={118} />
             <React.Fragment>
-              <Skeleton />
-              <Skeleton width="60%" />
+                <Skeleton />
+                <Skeleton width="60%" />
             </React.Fragment>
         </div >
     )

@@ -5,7 +5,7 @@ import { useAuth0 } from './services/react-auth0-spa';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Profile from './components/user/Profile';
 import Home from './components/Home';
-import Header from './components/layouts/Header';
+import BaseLayout from './components/layouts/BaseLayout';
 import Footer from './components/layouts/Footer';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Specifications from './components/specification/Specifications';
@@ -14,6 +14,7 @@ import SpecificationDetailsComponent from './components/dedicated-specification-
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
+import Dashboard from './components/user/Dashboard';
 
 const App: React.FunctionComponent = () => {
   const { isLoggingIn } = useAuth0();
@@ -33,15 +34,16 @@ const App: React.FunctionComponent = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <Header />
-          <Switch>
-            <Route path="/" exact component={Home} />
-            <PrivateRoute path="/specification-builder" Component={SpecificationBuilder} />
-            <PrivateRoute path="/profile" Component={Profile} />
-            <Route path="/specifications" component={Specifications} />
-            <Route path="/:slug" component={SpecificationDetailsComponent} />
-          </Switch>
-          <Footer />
+          <BaseLayout>
+            <Switch>
+              <Route path="/" exact component={Home} />
+              <PrivateRoute path="/dashboard" Component={Dashboard} />
+              <PrivateRoute path="/specification-builder" Component={SpecificationBuilder} />
+              <PrivateRoute path="/profile" Component={Profile} />
+              <Route path="/specifications" component={Specifications} />
+              <Route path="/:slug" component={SpecificationDetailsComponent} />
+            </Switch>
+          </BaseLayout>
         </BrowserRouter>
       </ThemeProvider>
     </div>
