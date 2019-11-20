@@ -35,11 +35,11 @@ const App: React.FunctionComponent = () => {
         <BrowserRouter>
           <Header />
           <Switch>
-            <Route path="/specification/:id" component={SpecificationDetailsComponent} />
-            <Route path="/specification-builder" component={SpecificationBuilder} />
-            <Route path="/specifications" component={Specifications} />
             <Route path="/" exact component={Home} />
+            <PrivateRoute path="/specification-builder" Component={SpecificationBuilder} />
             <PrivateRoute path="/profile" Component={Profile} />
+            <Route path="/specifications" component={Specifications} />
+            <Route path="/:slug" component={SpecificationDetailsComponent} />
           </Switch>
           <Footer />
         </BrowserRouter>

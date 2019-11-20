@@ -30,7 +30,7 @@ const Specifications = () => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [showSpecModal, setShowSpecModal] = useState(false);
-    const [selectedSpecId, setSelectedSpecId] = useState<number>();
+    const [selectedSpecSlug, setSelectedSpecSlug] = useState<string>();
 
     const [orderBy, setOrderBy] = useState<OrderingOptions>(OrderingOptions.CreatedAtDesc)
 
@@ -64,8 +64,8 @@ const Specifications = () => {
     //     }
     // }, [specs])
 
-    const openSpecModal = (id: number) => {
-        setSelectedSpecId(id);
+    const openSpecModal = (slug: string) => {
+        setSelectedSpecSlug(slug);
         setShowSpecModal(true);
     }
     const closeSpecModal = () => { setShowSpecModal(false); }
@@ -81,9 +81,9 @@ const Specifications = () => {
         mainContent = <div>No specs found...</div>
     } else {
         mainContent = specs.map(spec => (
-            <div key={spec.id} onClick={() => openSpecModal(spec.id)}>
+            <div key={spec.id} onClick={() => openSpecModal(spec.slug)}>
                 <Grid item>
-                    <Specification title={spec.title} creationDate={spec.createdAt} />
+                    <Specification slug={spec.slug} title={spec.title} creationDate={spec.createdAt} />
                 </Grid>
             </div>
         ))
@@ -104,9 +104,9 @@ const Specifications = () => {
                 currentPage={currentPage}
                 onPageChanged={handlePageChange}
             />}
-            {selectedSpecId && (
+            {selectedSpecSlug && (
                 <SpecificationModal
-                    specificationId={selectedSpecId}
+                    slug={selectedSpecSlug}
                     isOpen={showSpecModal}
                     onClose={closeSpecModal}
                 />

@@ -16,5 +16,7 @@ namespace Persistence.Queries
             SpecificationOrderOptions orderOption);
 
         Task<int> CountSpecificationsThatMatchText(string searchText);
+        Task<bool> SlugIsTaken(string slug);
+        Task<Specification> FetchBySlugAsync(string slug);
     }
 }

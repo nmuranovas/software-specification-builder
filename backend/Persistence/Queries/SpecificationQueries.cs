@@ -93,5 +93,18 @@ namespace Persistence.Queries
         {
             return _context.Specifications.AnyAsync(s => s.Id == id);
         }
+
+        public Task<bool> SlugIsTaken(string slug)
+        {
+            return _context.Specifications.AnyAsync(spec => string.Equals(spec.Slug.ToLower(), slug.ToLower()));
+        }
+
+        public Task<Specification> FetchBySlugAsync(string slug)
+        {
+            return _context.Specifications
+                .Include(spec => spec.FunctionalRequirements)
+                .Include(spec => spec.NonFunctionalRequirements)
+                .FirstOrDefaultAsync(spec => string.Equals(slug.ToLower(), spec.Slug));
+        }
     }
 }

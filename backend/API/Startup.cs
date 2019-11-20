@@ -1,3 +1,4 @@
+using API.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +43,7 @@ namespace API
             // Command and query service registration
             services.AddScoped<ISpecificationCommands, SpecificationCommands>();
             services.AddScoped<ISpecificationQueries, SpecificationQueries>();
+            services.AddScoped<ISlugValidator, SlugValidator>();
 
             // Generated services
             services.AddControllers().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);

@@ -6,6 +6,8 @@ import ListEditingComponent from './ListEditingComponent';
 import Axios from 'axios';
 import DottedSpinner from '../spinners/DottedSpinner';
 import UploadSuccessComponent from './UploadSuccessComponent';
+import { uploadSpecification, generateSlug } from '../../services/BackendAPI';
+import { useAuth0 } from '../../services/react-auth0-spa';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -38,11 +40,13 @@ function getSteps() {
 const SpecificationBuilder = () => {
     const classes = useStyles();
     const steps = getSteps();
+    const {getTokenSilently} = useAuth0();
 
     const [activeStep, setActiveStep] = useState(0);
     const [title, setTitle] = useState("")
     const [audience, setAudience] = useState("")
     const [intendedUse, setIntendedUse] = useState("")
+    const [slug, setSlug] = useState("")
 
     const [functionalRequirements, setFunctionalRequirements] = useState([""]);
     const [nonFunctionalRequirements, setNonFunctionalRequirements] = useState([""]);
@@ -64,20 +68,14 @@ const SpecificationBuilder = () => {
             title,
             audience,
             intendedUse,
+            slug,
             functionalRequirements: functionalRequirements.map((fr, index) => { return { description: fr, orderNumber: index } }),
             nonFunctionalRequirements: nonFunctionalRequirements.map((fr, index) => { return { description: fr, orderNumber: index } }),
         });
 
-        setTimeout(() => {
-            Axios({
-                method: 'post',
-                url: '/api/specification',
-                data: jsonifiedObj,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }).then(res => {
+        setTimeout(async () => {
+            const token: string = await getTokenSilently();
+            uploadSpecification(jsonifiedObj, token).then(res => {
                 console.log(res)
                 setNewSpecificationLink(res.data.title);
             }).catch(err => {
@@ -88,14 +86,21 @@ const SpecificationBuilder = () => {
         }, 1000)
     }
 
+    const handleTitleChange = async (newValue: string) => {
+        setTitle(newValue);
+        const token: string = await getTokenSilently();
+        const response = await generateSlug(newValue, token);
+        setSlug(response.data)
+    }
 
     const getStepContent = (stepIndex: number) => {
         switch (stepIndex) {
             case 0:
                 return <SpecificationInfoForm
-                    intendedUse={intendedUse} intendedUseChanged={setIntendedUse}
-                    audience={audience} audienceChanged={setAudience}
-                    title={title} titleChanged={setTitle} />;
+                            intendedUse={intendedUse} intendedUseChanged={setIntendedUse}
+                            audience={audience} audienceChanged={setAudience}
+                            title={title} titleChanged={handleTitleChange}
+                            slug={slug} />;
             case 1:
                 return <ListEditingComponent title="Functional requirements"
                     values={functionalRequirements} valuesChanged={newValues => setFunctionalRequirements(newValues)} />;

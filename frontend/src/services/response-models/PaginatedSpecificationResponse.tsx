@@ -1,6 +1,6 @@
-import SpecificationModel from "../../models/Specification";
+import { ShortenedSpecificationModel } from "../../models/Specification";
 
 export type PaginatedSpecificationResponse = {
-    shortenedSpecifications: SpecificationModel[],
+    shortenedSpecifications: ShortenedSpecificationModel[],
     totalPageCount: number
 }

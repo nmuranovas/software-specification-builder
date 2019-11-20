@@ -4,12 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Models;
+using API.Validators;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Commands;
 using Persistence.Models;
 using Persistence.Queries;
+using Slugify;
 
 namespace API.Controllers
 {
@@ -19,11 +22,13 @@ namespace API.Controllers
     {
         private readonly ISpecificationCommands _specificationCommands;
         private readonly ISpecificationQueries _specificationQueries;
+        private readonly ISlugValidator _slugValidator;
 
-        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries)
+        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator)
         {
             _specificationCommands = specificationCommands;
             _specificationQueries = specificationQueries;
+            _slugValidator = slugValidator;
         }
 
         [HttpDelete("{id}")]
@@ -65,6 +70,7 @@ namespace API.Controllers
                 {
                     Id = spec.Id,
                     CreatedAt = spec.CreatedAt,
+                    Slug = spec.Slug,
                     Title = spec.Title
                 });
             }
@@ -79,10 +85,10 @@ namespace API.Controllers
             };
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Specification>> Get(int id)
+        [HttpGet("{slug}")]
+        public async Task<ActionResult<Specification>> GetBySlug(string slug)
         {
-            var specification = await _specificationQueries.FetchByIdAsync(id);
+            var specification = await _specificationQueries.FetchBySlugAsync(slug);
             if (specification == null)
             {
                 return NotFound();
@@ -133,6 +139,7 @@ namespace API.Controllers
                 {
                     Id = spec.Id,
                     CreatedAt = spec.CreatedAt,
+                    Slug = spec.Slug,
                     Title = spec.Title
                 });
             }
@@ -147,9 +154,19 @@ namespace API.Controllers
             };
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Specification>> Post(Specification specification)
         {
+            if (!_slugValidator.IsValid(specification.Slug))
+            {
+                return BadRequest("Slug is not valid");
+            }
+            else if (await _specificationQueries.SlugIsTaken(specification.Slug))
+            {
+                return BadRequest("Slug is taken");
+            }
+
             await _specificationCommands.InsertSpecification(specification);
             return CreatedAtAction(nameof(Get), new { id = specification.Id }, specification);
         }

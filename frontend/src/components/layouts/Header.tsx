@@ -53,15 +53,17 @@ export default function Header() {
                 </Button>
                 {isAuthenticated && (
                     <Button>
-                        <Link to="/profile">Profile</Link>
+                        <Link className={classes.unstyledLink} to="/profile">Profile</Link>
                     </Button>
                 )}
                 <Button>
                     <Link className={classes.unstyledLink} to="/specifications">Specifications</Link>
                 </Button>
+                {isAuthenticated && (
                 <Button>
                     <Link className={classes.unstyledLink} to="/specification-builder">Builder</Link>
                 </Button>
+                )}
                 {loginLogoutButtons}
             </Toolbar>
         </AppBar>

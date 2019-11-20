@@ -32,7 +32,8 @@ export const Auth0Provider = ({
     onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
     domain,
     client_id,
-    redirect_uri
+    redirect_uri,
+    audience
 }: Auth0ProviderProps) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [user, setUser] = useState<any>();
@@ -42,7 +43,7 @@ export const Auth0Provider = ({
 
     useEffect(() => {
         const initAuth0 = async () => {
-            const auth0FromHook = await createAuth0Client({domain, client_id, redirect_uri});
+            const auth0FromHook = await createAuth0Client({domain, client_id, redirect_uri, audience});
             setAuth0Client(auth0FromHook);
 
             if (window.location.search.includes("code=")) {

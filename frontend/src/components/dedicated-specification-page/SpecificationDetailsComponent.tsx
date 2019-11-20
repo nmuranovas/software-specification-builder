@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Box, Paper, Grid, Typography, Divider, Container } from '@material-ui/core'
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import { fetchSpecData } from '../../services/BackendAPI';
-import { useParams } from 'react-router';
+import { useParams, useHistory } from 'react-router';
 import SpecificationModel from '../../models/Specification';
 import AuthorComponent from './AuthorComponent';
 import RequirementPanel from './RequirementPanel';
@@ -29,16 +29,18 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SpecificationDetailsComponent = () => {
     const styles = useStyles();
-    const { id } = useParams();
-    const [, setIsLoading] = useState(true);
+    const { slug } = useParams();
+    const [isLoading, setIsLoading] = useState(true);
     const [specDetails, setSpecDetails] = useState<SpecificationModel>()
-
-    const parsedId = parseInt(id !== undefined ? id : '0');
+    const history = useHistory();
 
     useEffect(() => {
+        if (slug === undefined) 
+            return;
+
         const fetchData = async () => {
             try {
-                const specData = await fetchSpecData(parsedId);
+                const specData = await fetchSpecData(slug);
                 setSpecDetails(specData);
             } catch (error) {
                 console.log(error);
@@ -49,6 +51,10 @@ const SpecificationDetailsComponent = () => {
 
         fetchData();
     }, [])
+
+    if (slug === undefined) {
+        return <div>Not found</div>
+    }
 
     if (specDetails === undefined) {
         return <div>Loading...</div>

@@ -5,6 +5,7 @@ export type SpecRequirement = {
 
 export type SpecificationModel = {
     id: number,
+    slug: string,
     title: string,
     audience: string,
     intendedUse: string,
@@ -17,6 +18,7 @@ export type SpecificationModel = {
 export type ShortenedSpecificationModel = {
     id: number,
     title: string,
+    slug: string,
     createdAt: Date
 }
 

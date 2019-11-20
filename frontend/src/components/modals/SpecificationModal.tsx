@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
 }))
 
 type SpecificationModalProps = {
-    specificationId: number,
+    slug: string,
     isOpen: boolean,
     onClose: () => void,
 }
@@ -29,7 +29,7 @@ const SpecificationModal = (props: SpecificationModalProps) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const specData = await fetchSpecData(props.specificationId);
+                const specData = await fetchSpecData(props.slug);
                 setSpecification(specData);
             } catch (error) {
                 console.log(error)
@@ -37,10 +37,10 @@ const SpecificationModal = (props: SpecificationModalProps) => {
         }
 
         fetchData();
-    }, [props.specificationId])
+    }, [props.slug])
 
     let modalContent = null;
-    if (specification === undefined || !props.specificationId) {
+    if (specification === undefined || !props.slug) {
         modalContent = (
             <React.Fragment>
                 <DialogTitle className={styles.dialogTitle}>Loading...</DialogTitle>
