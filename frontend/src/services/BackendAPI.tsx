@@ -32,10 +32,10 @@ export const fetchPaginatedSpecificationsWithSearch = async (searchText: string,
 }
 
 export const uploadSpecification = async (jsonData: string, token: string) => {
-    if (!jsonData){
+    if (!jsonData) {
         throw new Error("Specification json data must be specified")
     }
-    if (!token){
+    if (!token) {
         throw new Error("Authorization token must be specified")
     }
     debugger
@@ -65,4 +65,18 @@ export const generateSlug = async (keyword: string, token: string) => {
             Authorization: `Bearer ${token}`
         }
     });
+}
+
+export type SpecificationUpdateModel = {
+    audience : string
+    intendedUse : string
+    functionalRequirements : string[]
+    nonFunctionalRequirements : string[]
+}
+export const putSpecification = async (id: number, model: SpecificationUpdateModel, token: string) => {
+    return await Axios.put(`/api/specification/${id}`, model, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
 }

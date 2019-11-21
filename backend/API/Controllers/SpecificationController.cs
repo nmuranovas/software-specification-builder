@@ -171,13 +171,23 @@ namespace API.Controllers
             return CreatedAtAction(nameof(Get), new { id = specification.Id }, specification);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, Specification specification)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, SpecificationUpdateModel specificationUpdateModel)
         {
+            var specification = await _specificationQueries.FetchByIdAsync(id);
             if (id != specification.Id)
             {
                 return BadRequest();
             }
+
+            specification.Audience = specificationUpdateModel.Audience;
+            specification.IntendedUse = specificationUpdateModel.IntendedUse;
+            specification.FunctionalRequirements = specificationUpdateModel
+                .FunctionalRequirements.Select((fr, index) => new FunctionalRequirement
+                { Description = fr, OrderNumber = (uint)index }).ToList();
+            specification.NonFunctionalRequirements = specificationUpdateModel
+                .NonFunctionalRequirements.Select((fr, index) => new NonFunctionalRequirement
+                { Description = fr, OrderNumber = (uint)index }).ToList();
 
             try
             {

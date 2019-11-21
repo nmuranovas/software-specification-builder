@@ -15,6 +15,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
 import Dashboard from './components/user/Dashboard';
+import SpecificationEditingComponent from './components/specification-edit/SpecificationEditingComponent';
 
 const App: React.FunctionComponent = () => {
   const { isLoggingIn } = useAuth0();
@@ -35,14 +36,15 @@ const App: React.FunctionComponent = () => {
         <CssBaseline />
         <BrowserRouter>
           <BaseLayout>
-            <Switch>
-              <Route path="/" exact component={Home} />
-              <PrivateRoute path="/dashboard" Component={Dashboard} />
-              <PrivateRoute path="/specification-builder" Component={SpecificationBuilder} />
-              <PrivateRoute path="/profile" Component={Profile} />
-              <Route path="/specifications" component={Specifications} />
-              <Route path="/:slug" component={SpecificationDetailsComponent} />
-            </Switch>
+          <Switch>
+            <Route path="/" exact component={Home} />
+            <PrivateRoute path="/dashboard" Component={Dashboard} />
+            <PrivateRoute path="/specification-builder" Component={SpecificationBuilder} />
+            <PrivateRoute path="/profile" Component={Profile} />
+            <PrivateRoute path="/edit/:slug" Component={SpecificationEditingComponent} />
+            <Route path="/specifications" component={Specifications} />
+            <Route path="/:slug" component={SpecificationDetailsComponent} />
+          </Switch>
           </BaseLayout>
         </BrowserRouter>
       </ThemeProvider>

@@ -41,6 +41,7 @@ namespace Persistence.Commands
 
         public async Task UpdateSpecification(Specification specification)
         {
+            specification.LastModified = DateTime.UtcNow;
             _context.Entry(specification).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }

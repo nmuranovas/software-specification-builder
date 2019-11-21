@@ -10,5 +10,6 @@ namespace Persistence
         public DbSet<Specification> Specifications { get; set; }
         public DbSet<FunctionalRequirement> FunctionalRequirements { get; set; }
         public DbSet<NonFunctionalRequirement> NonFunctionalRequirements { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
