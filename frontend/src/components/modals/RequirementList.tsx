@@ -3,7 +3,7 @@ import { ListItem, ListItemText, List } from '@material-ui/core'
 import { SpecRequirement } from '../../models/Specification'
 
 type RequirementListProps = {
-    requirements: SpecRequirement[],
+    requirements: string[],
     listItemNumberingText: string
 }
 
@@ -12,7 +12,7 @@ const RequirementList = (props: RequirementListProps) => {
         <ListItem key={index} alignItems="flex-start">
             <ListItemText
                 primary={`${props.listItemNumberingText} #${index + 1}`}
-                secondary={req.description} />
+                secondary={req} />
         </ListItem>
     ))
 

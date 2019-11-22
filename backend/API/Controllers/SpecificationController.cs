@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Mappers;
 using API.Models;
 using API.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -23,12 +24,14 @@ namespace API.Controllers
         private readonly ISpecificationCommands _specificationCommands;
         private readonly ISpecificationQueries _specificationQueries;
         private readonly ISlugValidator _slugValidator;
+        private readonly ISpecificationResponseMapper _specificationResponseMapper;
 
-        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator)
+        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator, ISpecificationResponseMapper specificationResponseMapper)
         {
             _specificationCommands = specificationCommands;
             _specificationQueries = specificationQueries;
             _slugValidator = slugValidator;
+            _specificationResponseMapper = specificationResponseMapper;
         }
 
         [HttpDelete("{id}")]
@@ -46,7 +49,7 @@ namespace API.Controllers
         }
 
         [HttpGet, Route("/api/[controller]/search")]
-        public async Task<ActionResult<PaginatedSpecifications>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
+        public async Task<ActionResult<PaginatedSpecificationsResponse>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
         {
             SpecificationOrderOptions orderOption;
             switch (sortByTerm)
@@ -63,30 +66,21 @@ namespace API.Controllers
             }
 
             var specifications = await _specificationQueries.SearchByTextAsync(searchText, pageNumber, itemCount, orderOption);
-            var shortenedSpecifications = new List<ShortenedSpecification>();
-            foreach (var spec in specifications)
-            {
-                shortenedSpecifications.Add(new ShortenedSpecification
-                {
-                    Id = spec.Id,
-                    CreatedAt = spec.CreatedAt,
-                    Slug = spec.Slug,
-                    Title = spec.Title
-                });
-            }
+            var shortenedSpecifications = _specificationResponseMapper.MapModelsToShortShortResponses(specifications);
 
             var totalSpecifications = await _specificationQueries.CountSpecificationsThatMatchText(searchText);
             var totalPageCount = (totalSpecifications + itemCount - 1) / itemCount;
 
-            return new PaginatedSpecifications
+            return new PaginatedSpecificationsResponse
             {
                 ShortenedSpecifications = shortenedSpecifications,
                 TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
             };
         }
 
+
         [HttpGet("{slug}")]
-        public async Task<ActionResult<Specification>> GetBySlug(string slug)
+        public async Task<ActionResult<DetailedSpecificationResponse>> GetBySlug(string slug)
         {
             var specification = await _specificationQueries.FetchBySlugAsync(slug);
             if (specification == null)
@@ -95,27 +89,13 @@ namespace API.Controllers
             }
             else
             {
-                return specification;
+                var response = _specificationResponseMapper.MapModelToDetailedResponse(specification);
+                return response;
             }
         }
 
-        //[HttpGet("{pageNumber}/{itemCount}")]
-        //public ActionResult<PaginatedSpecifications> Get(int pageNumber = 0, int itemCount = 10)
-        //{
-        //    var specifications = _specificationQueries.FindAllByPageNumberAndSize(pageNumber, itemCount);
-        //    var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
-
-        //    var totalPageCount = totalSpecificationCount / itemCount;
-
-        //    return new PaginatedSpecifications
-        //    {
-        //        Specifications = specifications,
-        //        TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
-        //    };
-        //}
-
         [HttpGet]
-        public ActionResult<PaginatedSpecifications> Get([FromQuery]int pageNumber = 0, [FromQuery]int itemCount = 10, [FromQuery]string sortByTerm = null)
+        public ActionResult<PaginatedSpecificationsResponse> Get([FromQuery]int pageNumber = 0, [FromQuery]int itemCount = 10, [FromQuery]string sortByTerm = null)
         {
             SpecificationOrderOptions orderOption;
             switch (sortByTerm)
@@ -132,22 +112,12 @@ namespace API.Controllers
             }
 
             var specifications = _specificationQueries.FindAllByPageNumberAndSizeOrderedBy(pageNumber, itemCount, orderOption);
-            var shortenedSpecifications = new List<ShortenedSpecification>();
-            foreach (var spec in specifications)
-            {
-                shortenedSpecifications.Add(new ShortenedSpecification
-                {
-                    Id = spec.Id,
-                    CreatedAt = spec.CreatedAt,
-                    Slug = spec.Slug,
-                    Title = spec.Title
-                });
-            }
+            var shortenedSpecifications = _specificationResponseMapper.MapModelsToShortShortResponses(specifications);
 
             var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
             var totalPageCount = totalSpecificationCount / itemCount;
 
-            return new PaginatedSpecifications
+            return new PaginatedSpecificationsResponse
             {
                 ShortenedSpecifications = shortenedSpecifications,
                 TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
@@ -167,10 +137,13 @@ namespace API.Controllers
                 return BadRequest("Slug is taken");
             }
 
+            specification.UserId = ((User)HttpContext.Items["User"]).Id;
+
             await _specificationCommands.InsertSpecification(specification);
             return CreatedAtAction(nameof(Get), new { id = specification.Id }, specification);
         }
 
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, SpecificationUpdateModel specificationUpdateModel)
         {
@@ -206,6 +179,17 @@ namespace API.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpGet("my-specifications")]
+        [Authorize]
+        public async Task<ActionResult<ShortenedSpecificationsResponse>> GetUserSpecifications()
+        {
+            var userEmail = ((User)HttpContext.Items["User"]).Email;
+            var specifications = await _specificationQueries.FetchUserSpecifications(userEmail);
+            var shortenedSpecifications = _specificationResponseMapper.MapModelsToShortShortResponses(specifications);
+
+            return Ok(new ShortenedSpecificationsResponse { Specifications = shortenedSpecifications });
         }
     }
 }

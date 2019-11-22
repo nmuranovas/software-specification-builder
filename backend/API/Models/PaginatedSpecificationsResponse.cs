@@ -3,9 +3,9 @@ using Persistence.Models;
 
 namespace API.Models
 {
-    public class PaginatedSpecifications
+    public class PaginatedSpecificationsResponse
     {
-        public IEnumerable<ShortenedSpecification> ShortenedSpecifications { get; set; }
+        public IEnumerable<ShortSpecificationResponse> ShortenedSpecifications { get; set; }
         public int TotalPageCount { get; set; }
     }
 }

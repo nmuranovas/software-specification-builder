@@ -4,14 +4,14 @@ import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typograph
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 type RequirementPanelProps = {
-    requirements: SpecRequirement[],
+    requirements: string[],
     heading: string
 }
 
 const RequirementPanel = (props: RequirementPanelProps) => {
     const requirements = props.requirements.map((req, index) => (
         <Typography key={index}>
-            {index + 1}. {req.description}
+            {index + 1}. {req}
         </Typography>
     ))
 
@@ -24,8 +24,6 @@ const RequirementPanel = (props: RequirementPanelProps) => {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
                 {requirements}
-                {/* <RequirementList requirements={props.requirements}
-                    listItemNumberingText="Non-Functional requirement" /> */}
             </ExpansionPanelDetails>
         </ExpansionPanel>
     )

@@ -1,11 +1,11 @@
-import SpecificationModel from "../models/Specification"
+import SpecificationModel, { DetailedSpecification } from "../models/Specification"
 import Axios from "axios";
 import { PaginatedSpecificationResponse } from "./response-models/PaginatedSpecificationResponse";
 import { OrderingOptions } from "../models/OrderingOptions";
 
 export const fetchSpecData = async (slug: string) => {
     const { data } = await Axios.get(`/api/specification/${slug}`)
-    return data as SpecificationModel;
+    return data as DetailedSpecification;
 }
 
 export const fetchPaginatedSpecifications = async (page: number, itemCount: number, ordering: OrderingOptions) => {
@@ -79,4 +79,12 @@ export const putSpecification = async (id: number, model: SpecificationUpdateMod
             Authorization: `Bearer ${token}`
         }
     })
+}
+
+export const fetchMySpecifications = async (token: string) => {
+    return await Axios.get(`/api/specification/my-specifications`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
 }

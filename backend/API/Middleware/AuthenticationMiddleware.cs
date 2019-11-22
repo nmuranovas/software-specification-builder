@@ -48,11 +48,14 @@ namespace API.Middleware
                     await using var responseStream = await response.Content.ReadAsStreamAsync();
                     var responseString = new StreamReader(responseStream).ReadToEnd();
                     dynamic userDetails = JObject.Parse(responseString);
-                    if (!(await userQueries.UserExists((string)userDetails.email)))
+                    var userFromDatabase = await userQueries.FindUser((string) userDetails.email);
+                    if (userFromDatabase == null)
                     {
-                        await userCommands.InsertUser((string)userDetails.email, (string)userDetails.picture, (string)userDetails.nickname);
+                        userFromDatabase = await userCommands.InsertUser((string)userDetails.email, (string)userDetails.picture, (string)userDetails.nickname);
                         Console.WriteLine($"User {(string)userDetails.Email} inserted to database");
                     }
+
+                    context.Items["User"] = userFromDatabase;
                 }
             }
 

@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using Persistence.Models;
 
 namespace Persistence.Commands
 {
     public interface IUserCommands
     {
-        Task InsertUser(string email, string pictureUrl, string nickname);
+        Task<User> InsertUser(string email, string pictureUrl, string nickname);
     }
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Typography, TextField, makeStyles, Theme, createStyles, Grid, Box, Divider, Button } from '@material-ui/core'
-import SpecificationModel from '../../models/Specification'
+import SpecificationModel, { DetailedSpecification } from '../../models/Specification'
 import { fetchSpecData, putSpecification, SpecificationUpdateModel } from '../../services/BackendAPI'
 import { useParams } from 'react-router'
 import ListEditingComponent from '../specification-builder/ListEditingComponent'
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const SpecificationEditingComponent = () => {
     const classes = useStyles();
     const { slug } = useParams();
-    const [specDetails, setSpecDetails] = useState<SpecificationModel>()
+    const [specDetails, setSpecDetails] = useState<DetailedSpecification>()
     const {getTokenSilently} = useAuth0();
 
     const [isLoading, setIsLoading] = useState(true)
@@ -58,8 +58,8 @@ const SpecificationEditingComponent = () => {
                 setSpecDetails(specData);
                 setAudience(specData.audience)
                 setIntendedUse(specData.intendedUse)
-                setFunctionalRequirements(specData.functionalRequirements.map(fr => fr.description))
-                setNonFunctionalRequirements(specData.nonFunctionalRequirements.map(nfr => nfr.description))
+                setFunctionalRequirements(specData.functionalRequirements)
+                setNonFunctionalRequirements(specData.nonFunctionalRequirements)
             } catch (error) {
                 console.log(error)
             } finally {

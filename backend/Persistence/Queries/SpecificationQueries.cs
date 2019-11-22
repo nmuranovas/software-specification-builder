@@ -104,7 +104,15 @@ namespace Persistence.Queries
             return _context.Specifications
                 .Include(spec => spec.FunctionalRequirements)
                 .Include(spec => spec.NonFunctionalRequirements)
+                .Include(spec => spec.User)
                 .FirstOrDefaultAsync(spec => string.Equals(slug.ToLower(), spec.Slug));
+        }
+
+        public async Task<IEnumerable<Specification>> FetchUserSpecifications(string email)
+        {
+            return await _context.Specifications
+                .Include(spec => spec.User)
+                .Where(spec => spec.User.Email == email).ToListAsync();
         }
     }
 }

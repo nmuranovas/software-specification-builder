@@ -1,3 +1,4 @@
+using API.Mappers;
 using API.Middleware;
 using API.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,6 +37,7 @@ namespace API
             services.AddScoped<IUserCommands, UserCommands>();
             services.AddScoped<IUserQueries, UserQueries>();
             services.AddScoped<ISlugValidator, SlugValidator>();
+            services.AddSingleton<ISpecificationResponseMapper, SpecificationResponseMapper>();
             services.AddHttpClient();
             
             // Auth0 service registration

@@ -3,7 +3,7 @@ import { Box, Paper, Grid, Typography, Divider, Container } from '@material-ui/c
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import { fetchSpecData } from '../../services/BackendAPI';
 import { useParams, useHistory } from 'react-router';
-import SpecificationModel from '../../models/Specification';
+import SpecificationModel, { DetailedSpecification } from '../../models/Specification';
 import AuthorComponent from './AuthorComponent';
 import RequirementPanel from './RequirementPanel';
 
@@ -31,7 +31,7 @@ const SpecificationDetailsComponent = () => {
     const styles = useStyles();
     const { slug } = useParams();
     const [isLoading, setIsLoading] = useState(true);
-    const [specDetails, setSpecDetails] = useState<SpecificationModel>()
+    const [specDetails, setSpecDetails] = useState<DetailedSpecification>()
     const history = useHistory();
 
     useEffect(() => {
@@ -70,7 +70,7 @@ const SpecificationDetailsComponent = () => {
                         </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <AuthorComponent name="John Doe" imageLink="/john-doe.jpg" />
+                        <AuthorComponent username={specDetails.userDetails.username} imageLink={specDetails.userDetails.pictureUrl} />
                     </Grid>
                     <Grid item xs={12} className={styles.divider}>
                         <Divider />

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Zoom, makeStyles } from '@material-ui/core';
 import { TransitionProps } from '@material-ui/core/transitions'
-import SpecificationModel from '../../models/Specification';
+import SpecificationModel, { DetailedSpecification } from '../../models/Specification';
 import DottedSpinner from '../spinners/DottedSpinner';
 import { fetchSpecData } from '../../services/BackendAPI';
 import RequirementList from './RequirementList';
@@ -24,7 +24,7 @@ type SpecificationModalProps = {
 
 const SpecificationModal = (props: SpecificationModalProps) => {
     const styles = useStyles();
-    const [specification, setSpecification] = useState<SpecificationModel>()
+    const [specification, setSpecification] = useState<DetailedSpecification>()
     
     useEffect(() => {
         const fetchData = async () => {

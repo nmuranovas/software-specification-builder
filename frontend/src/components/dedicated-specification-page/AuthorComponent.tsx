@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 type AuthorComponentProps = {
-    name: string,
+    username: string,
     imageLink: string
 }
 
@@ -23,9 +23,9 @@ const AuthorComponent = (props: AuthorComponentProps) => {
     return (
         <Box className={styles.root}>
             <Typography style={{ margin: "auto 0", paddingRight: "5px" }} align="justify">
-                By: John Doe
+                By: {props.username}
             </Typography>
-            <Avatar alt={props.name} src={props.imageLink} />
+            <Avatar alt={props.username} src={props.imageLink} />
         </Box>
     )
 }

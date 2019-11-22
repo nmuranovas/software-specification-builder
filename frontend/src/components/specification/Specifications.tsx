@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Grid, Box } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import Specification from './Specification';
-import SpecificationModal from '../modals/SpecificationModal';
 import { ShortenedSpecificationModel } from '../../models/Specification';
 import DottedSpinner from '../spinners/DottedSpinner';
 import SlickPagination from '../pagination/SlickPagination';
@@ -107,13 +106,13 @@ const Specifications = () => {
                 currentPage={currentPage}
                 onPageChanged={handlePageChange}
             />}
-            {selectedSpecSlug && (
+            {/* {selectedSpecSlug && (
                 <SpecificationModal
                     slug={selectedSpecSlug}
                     isOpen={showSpecModal}
                     onClose={closeSpecModal}
                 />
-            )}
+            )} */}
             <Skeleton variant="rect" width={210} height={118} />
             <React.Fragment>
                 <Skeleton />

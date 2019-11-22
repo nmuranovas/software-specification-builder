@@ -18,5 +18,6 @@ namespace Persistence.Queries
         Task<int> CountSpecificationsThatMatchText(string searchText);
         Task<bool> SlugIsTaken(string slug);
         Task<Specification> FetchBySlugAsync(string slug);
+        Task<IEnumerable<Specification>> FetchUserSpecifications(string email);
     }
 }
