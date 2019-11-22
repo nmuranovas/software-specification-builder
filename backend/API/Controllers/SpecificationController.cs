@@ -25,18 +25,28 @@ namespace API.Controllers
         private readonly ISpecificationQueries _specificationQueries;
         private readonly ISlugValidator _slugValidator;
         private readonly ISpecificationResponseMapper _specificationResponseMapper;
+        private readonly IUserQueries _userQueries;
 
-        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator, ISpecificationResponseMapper specificationResponseMapper)
+        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator, ISpecificationResponseMapper specificationResponseMapper, IUserQueries userQueries)
         {
             _specificationCommands = specificationCommands;
             _specificationQueries = specificationQueries;
             _slugValidator = slugValidator;
             _specificationResponseMapper = specificationResponseMapper;
+            _userQueries = userQueries;
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Specification>> Delete(int id)
         {
+            var userId = ((User)HttpContext.Items["User"]).Id;
+            var specificationBelongsToUser = await _userQueries.SpecificationBelongsToUser(userId, id);
+            if (!specificationBelongsToUser)
+            {
+                return Unauthorized();
+            }
+
             var deletedEntity = await _specificationCommands.DeleteSpecification(id);
             if (deletedEntity == null)
             {
@@ -49,7 +59,7 @@ namespace API.Controllers
         }
 
         [HttpGet, Route("/api/[controller]/search")]
-        public async Task<ActionResult<PaginatedSpecificationsResponse>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
+        public async Task<ActionResult<PaginatedResponse<IEnumerable<ShortSpecificationResponse>>>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
         {
             SpecificationOrderOptions orderOption;
             switch (sortByTerm)
@@ -69,13 +79,8 @@ namespace API.Controllers
             var shortenedSpecifications = _specificationResponseMapper.MapModelsToShortShortResponses(specifications);
 
             var totalSpecifications = await _specificationQueries.CountSpecificationsThatMatchText(searchText);
-            var totalPageCount = (totalSpecifications + itemCount - 1) / itemCount;
 
-            return new PaginatedSpecificationsResponse
-            {
-                ShortenedSpecifications = shortenedSpecifications,
-                TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
-            };
+            return PaginatedResponseFactory.Create(shortenedSpecifications, pageNumber, itemCount, totalSpecifications);
         }
 
 
@@ -95,7 +100,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<PaginatedSpecificationsResponse> Get([FromQuery]int pageNumber = 0, [FromQuery]int itemCount = 10, [FromQuery]string sortByTerm = null)
+        public ActionResult<PaginatedResponse<IEnumerable<ShortSpecificationResponse>>> Get([FromQuery]int pageNumber = 0, [FromQuery]int itemCount = 10, [FromQuery]string sortByTerm = null)
         {
             SpecificationOrderOptions orderOption;
             switch (sortByTerm)
@@ -115,13 +120,8 @@ namespace API.Controllers
             var shortenedSpecifications = _specificationResponseMapper.MapModelsToShortShortResponses(specifications);
 
             var totalSpecificationCount = _specificationQueries.GetTotalSpecificationCount();
-            var totalPageCount = totalSpecificationCount / itemCount;
 
-            return new PaginatedSpecificationsResponse
-            {
-                ShortenedSpecifications = shortenedSpecifications,
-                TotalPageCount = totalPageCount == 0 ? 1 : totalPageCount
-            };
+            return PaginatedResponseFactory.Create(shortenedSpecifications, pageNumber, itemCount, totalSpecificationCount);
         }
 
         [Authorize]

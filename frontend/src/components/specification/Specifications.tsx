@@ -47,8 +47,8 @@ const Specifications = () => {
                     promise = fetchPaginatedSpecificationsWithSearch(searchString, currentPage, itemsPerPage, orderBy);
                 }
                 const response = await promise;
-                setSpecs(response.shortenedSpecifications)
-                setTotalPageCount(response.totalPageCount)
+                setSpecs(response.data)
+                setTotalPageCount((response.totalItemCount + response.pageSize - 1) / response.pageSize);
             } catch (error) {
                 console.log(error)
             } finally {

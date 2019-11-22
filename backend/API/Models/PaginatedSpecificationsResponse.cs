@@ -1,11 +1,26 @@
-﻿using System.Collections.Generic;
-using Persistence.Models;
+﻿using Persistence.Models;
 
 namespace API.Models
 {
-    public class PaginatedSpecificationsResponse
+    public class PaginatedResponse<T>
     {
-        public IEnumerable<ShortSpecificationResponse> ShortenedSpecifications { get; set; }
-        public int TotalPageCount { get; set; }
+        public T Data { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public int TotalItemCount { get; set; }
+    }
+
+    public class PaginatedResponseFactory
+    {
+        public static PaginatedResponse<T> Create<T>(T data, int page, int pageSize, int totalItemCount)
+        {
+            return new PaginatedResponse<T>
+            {
+                Data = data,
+                Page = page,
+                PageSize = pageSize,
+                TotalItemCount = totalItemCount
+            };
+        }
     }
 }

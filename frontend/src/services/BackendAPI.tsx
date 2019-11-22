@@ -1,7 +1,8 @@
-import SpecificationModel, { DetailedSpecification } from "../models/Specification"
+import SpecificationModel, { DetailedSpecification, ShortenedSpecificationModel } from "../models/Specification"
 import Axios from "axios";
 import { PaginatedSpecificationResponse } from "./response-models/PaginatedSpecificationResponse";
 import { OrderingOptions } from "../models/OrderingOptions";
+import PaginatedResponse from "./response-models/PaginatedResponse";
 
 export const fetchSpecData = async (slug: string) => {
     const { data } = await Axios.get(`/api/specification/${slug}`)
@@ -9,18 +10,19 @@ export const fetchSpecData = async (slug: string) => {
 }
 
 export const fetchPaginatedSpecifications = async (page: number, itemCount: number, ordering: OrderingOptions) => {
-    const { data } = await Axios.get(`/api/specification`, {
+    const response = await Axios.get(`/api/specification`, {
         params: {
             pageNumber: page,
             itemCount: itemCount,
             sortByTerm: ordering
         }
     });
-    return (data as PaginatedSpecificationResponse);
+
+    return (response.data as PaginatedResponse<ShortenedSpecificationModel[]>)
 }
 
 export const fetchPaginatedSpecificationsWithSearch = async (searchText: string, page: number, itemCount: number, ordering: OrderingOptions) => {
-    const { data } = await Axios.get(`/api/specification/search`, {
+    const response = await Axios.get(`/api/specification/search`, {
         params: {
             searchText: searchText,
             pageNumber: page,
@@ -28,7 +30,8 @@ export const fetchPaginatedSpecificationsWithSearch = async (searchText: string,
             sortByTerm: ordering
         }
     });
-    return (data as PaginatedSpecificationResponse);
+
+    return (response.data as PaginatedResponse<ShortenedSpecificationModel[]>)
 }
 
 export const uploadSpecification = async (jsonData: string, token: string) => {
@@ -83,6 +86,14 @@ export const putSpecification = async (id: number, model: SpecificationUpdateMod
 
 export const fetchMySpecifications = async (token: string) => {
     return await Axios.get(`/api/specification/my-specifications`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}
+
+export const deleteSpecification = async (id: number, token: string) => {
+    return await Axios.delete(`/api/specification/${id}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }

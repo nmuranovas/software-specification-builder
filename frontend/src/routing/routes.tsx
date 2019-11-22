@@ -3,7 +3,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import DescriptionIcon from '@material-ui/icons/Description';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import CreateIcon from '@material-ui/icons/Create';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 type Route = {
     link: string,
@@ -32,7 +32,7 @@ export const privateRoutes: Route[] = [{
 }, {
     link: "/specification-builder",
     text: "Builder",
-    icon: <CreateIcon />
+    icon: <AddBoxIcon />
 }]
 
 export default Route;
