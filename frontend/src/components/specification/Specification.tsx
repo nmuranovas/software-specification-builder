@@ -1,8 +1,6 @@
 import React from 'react'
-import { Card, CardHeader, CardMedia, Typography, CardContent, CardActions, IconButton, Collapse, Button } from '@material-ui/core'
+import { Card, CardHeader, CardMedia, Typography, CardContent, CardActions } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
@@ -20,22 +18,13 @@ const useStyles = makeStyles(theme => ({
     card: {
         maxWidth: 345
     },
-    expand: {
-        transform: 'rotate(0deg)',
-        marginLeft: 'auto',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest
-        })
-    },
-    expandOpen: {
-        transform: 'rotate(180deg)'
-    }
 }));
 
 type SpecificationProps = {
-    title: string,
-    creationDate: Date,
-    slug: string
+    title?: string,
+    creationDate?: Date,
+    slug?: string,
+    isLoading?: boolean
 }
 
 const Specification: React.FunctionComponent<SpecificationProps> = props => {
@@ -46,6 +35,7 @@ const Specification: React.FunctionComponent<SpecificationProps> = props => {
             <CardHeader
                 title={props.title}
                 subheader={props.creationDate} />
+
             <CardMedia
                 className={classes.media}
                 image="/React-icon.svg"

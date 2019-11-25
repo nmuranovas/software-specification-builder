@@ -1,5 +1,28 @@
 import React from 'react'
-import classes from './SlickPagination.module.css'
+import makeStyles from '@material-ui/styles/makeStyles';
+import { Theme, Container, Box, Button } from '@material-ui/core';
+
+const useStyles = makeStyles((theme: Theme) => ({
+    box: {
+    },
+    paginationOlder: {
+        marginRight: theme.spacing(2),
+        fontSize: "24px"
+    },
+    paginationNewer: {
+        marginLeft: theme.spacing(2),
+        fontSize: "24px"
+    },
+    paginationButton: {
+        margin: theme.spacing(0, 1),
+        cursor: 'pointer'
+    },
+    paginationActive: {
+        cursor: 'pointer',
+        color: theme.palette.primary.main,
+        margin: theme.spacing(0, 1)
+    }
+}));
 
 type SlickPaginationProps = {
     currentPage: number,
@@ -8,12 +31,13 @@ type SlickPaginationProps = {
 }
 
 const SlickPagination = (props: SlickPaginationProps) => {
+    const styles = useStyles();
 
     const pageNumbers = [];
     for (let i = 0; i < props.pageCount; i++) {
         pageNumbers.push(
-            <a key={i} onClick={() => props.onPageChanged(i)}
-                className={props.currentPage === i ? classes.paginationActive : undefined}>
+            <a key={i} style={{}} onClick={() => props.onPageChanged(i)}
+                className={props.currentPage === i ? styles.paginationActive : styles.paginationButton}>
                 {i + 1}
             </a>
         );
@@ -38,23 +62,28 @@ const SlickPagination = (props: SlickPaginationProps) => {
     }
 
     const prevButton = (
-        <a className={classes.paginationOlder} onClick={handlePreviousClick}>PREV</a>
+        <Button className={styles.paginationOlder} disabled={props.currentPage === 0} onClick={handlePreviousClick}>PREV</Button>
     )
 
     const nextButton = (
-        <a className={classes.paginationNewer} onClick={handleNextClick}>NEXT</a>
+        <Button className={styles.paginationNewer} disabled={isLastPage} onClick={handleNextClick}>NEXT</Button>
     )
 
     return (
-        <nav className={classes.paginationContainer}>
-            <div className={classes.pagination}>
-                {prevButton}
-                <span className={classes.paginationInner}>
+        <Box component='nav'
+            display="flex"
+            justifyContent="center"
+            fontWeight="fontWeigthBold"
+            fontSize="24px"
+            m={1} p={1}>
+            {prevButton}
+            <Box display="flex" flexDirection="column" justifyContent="center">
+                <div>
                     {pageNumbers}
-                </span>
-                {nextButton}
-            </div>
-        </nav>
+                </div>
+            </Box>
+            {nextButton}
+        </Box>
     )
 }
 

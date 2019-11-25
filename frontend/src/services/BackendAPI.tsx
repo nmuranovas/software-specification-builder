@@ -41,7 +41,6 @@ export const uploadSpecification = async (jsonData: string, token: string) => {
     if (!token) {
         throw new Error("Authorization token must be specified")
     }
-    debugger
     return await Axios({
         method: 'post',
         url: '/api/specification',

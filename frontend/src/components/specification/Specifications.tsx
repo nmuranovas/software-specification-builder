@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, Box } from '@material-ui/core'
+import { Grid, Box, Zoom } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import Specification from './Specification';
 import { ShortenedSpecificationModel } from '../../models/Specification';
@@ -23,12 +23,12 @@ const useStyles = makeStyles(theme => ({
 
 const Specifications = () => {
     const classes = useStyles();
-    const [specs, setSpecs] = useState<ShortenedSpecificationModel[]>();
 
     const [totalPageCount, setTotalPageCount] = useState(0)
-    const [itemsPerPage] = useState(2)
+    const [itemsPerPage] = useState(1)
     const [currentPage, setCurrentPage] = useState(0);
     const [searchString, setSearchString] = useState<string>()
+    const [specs, setSpecs] = useState<ShortenedSpecificationModel[]>();
 
     const [isLoading, setIsLoading] = useState(true);
     const [showSpecModal, setShowSpecModal] = useState(false);
@@ -37,7 +37,6 @@ const Specifications = () => {
     const [orderBy, setOrderBy] = useState<OrderingOptions>(OrderingOptions.CreatedAtDesc)
 
     useEffect(() => {
-        setIsLoading(true);
         const fetchData = async () => {
             try {
                 let promise: Promise<PaginatedSpecificationResponse>;
@@ -48,7 +47,7 @@ const Specifications = () => {
                 }
                 const response = await promise;
                 setSpecs(response.data)
-                setTotalPageCount((response.totalItemCount + response.pageSize - 1) / response.pageSize);
+                setTotalPageCount(Math.floor((response.totalItemCount + response.pageSize - 1) / response.pageSize));
             } catch (error) {
                 console.log(error)
             } finally {
@@ -70,24 +69,25 @@ const Specifications = () => {
         setSelectedSpecSlug(slug);
         setShowSpecModal(true);
     }
+
     const closeSpecModal = () => { setShowSpecModal(false); }
 
-    const handlePageChange = (pageNumber: number) => { setCurrentPage(pageNumber) }
-    const handleOrderChange = (orderTerm: OrderingOptions) => { setOrderBy(orderTerm) }
-    const handleSearchSubmit = (searchString: string) => { setCurrentPage(0); setSearchString(searchString) }
+    const handlePageChange = (pageNumber: number) => { setCurrentPage(pageNumber); setIsLoading(true); }
+    const handleOrderChange = (orderTerm: OrderingOptions) => { setOrderBy(orderTerm); setIsLoading(true); }
+    const handleSearchSubmit = (searchString: string) => { setCurrentPage(0); setSearchString(searchString); setIsLoading(true); }
 
     let mainContent = undefined;
-    if (isLoading) {
-        mainContent = <DottedSpinner color="black" />;
-    } else if (specs === undefined || specs.length === 0) {
+    if (specs === undefined || specs.length === 0) {
         mainContent = <div>No specs found...</div>
     } else {
-        mainContent = specs.map(spec => (
-            <div className={classes.specificationCard} key={spec.id} onClick={() => openSpecModal(spec.slug)}>
-                <Grid item>
-                    <Specification slug={spec.slug} title={spec.title} creationDate={spec.createdAt} />
-                </Grid>
-            </div>
+        mainContent = specs.map((spec, index) => (
+            <Zoom in={!isLoading} style={{transitionDelay: `${index * 100}ms`}}>
+                <div className={classes.specificationCard} key={spec.id} onClick={() => openSpecModal(spec.slug)}>
+                    <Grid item>
+                        <Specification slug={spec.slug} title={spec.title} creationDate={spec.createdAt} />
+                    </Grid>
+                </div>
+            </Zoom>
         ))
     }
 
@@ -113,11 +113,11 @@ const Specifications = () => {
                     onClose={closeSpecModal}
                 />
             )} */}
-            <Skeleton variant="rect" width={210} height={118} />
+            {/* <Skeleton variant="rect" width={210} height={118} />
             <React.Fragment>
                 <Skeleton />
                 <Skeleton width="60%" />
-            </React.Fragment>
+            </React.Fragment> */}
         </div >
     )
 }

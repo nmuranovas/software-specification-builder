@@ -10,7 +10,7 @@ import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/sty
 import { useAuth0 } from '../../services/react-auth0-spa';
 import { Link } from 'react-router-dom'
 import Route, { publicRoutes, privateRoutes } from '../../routing/routes';
-import { ListItemText, ListItemIcon, ListItem, Drawer, Divider, List } from '@material-ui/core';
+import { ListItemText, ListItemIcon, ListItem, Drawer, Divider, List, Container } from '@material-ui/core';
 import clsx from 'clsx'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -86,6 +86,10 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '100vh',
             overflow: 'auto',
         },
+        container: {
+            paddingTop: theme.spacing(4),
+            paddingBottom: theme.spacing(4),
+        }
     })
 );
 
@@ -188,7 +192,7 @@ const BaseLayout: React.FunctionComponent = (props) => {
                 </List>
             </Drawer>
             <main className={classes.content}>
-                <div className={classes.toolbar}/>
+                <div className={classes.toolbar} />
                 {props.children}
                 <Footer />
             </main>
