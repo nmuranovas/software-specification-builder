@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Mappers;
 using API.Models;
+using API.Services;
 using API.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -26,22 +28,28 @@ namespace API.Controllers
         private readonly ISlugValidator _slugValidator;
         private readonly ISpecificationResponseMapper _specificationResponseMapper;
         private readonly IUserQueries _userQueries;
+        private readonly IAuth0Service _auth0Service;
+        private readonly IUserCommands _userCommands;
+        private readonly ISlugService _slugService;
 
-        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator, ISpecificationResponseMapper specificationResponseMapper, IUserQueries userQueries)
+        public SpecificationController(ISpecificationCommands specificationCommands, ISpecificationQueries specificationQueries, ISlugValidator slugValidator, ISpecificationResponseMapper specificationResponseMapper, IUserQueries userQueries, IAuth0Service auth0Service, IUserCommands userCommands, ISlugService slugService)
         {
             _specificationCommands = specificationCommands;
             _specificationQueries = specificationQueries;
             _slugValidator = slugValidator;
             _specificationResponseMapper = specificationResponseMapper;
             _userQueries = userQueries;
+            _auth0Service = auth0Service;
+            _userCommands = userCommands;
+            _slugService = slugService;
         }
 
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Specification>> Delete(int id)
         {
-            var userId = ((User)HttpContext.Items["User"]).Id;
-            var specificationBelongsToUser = await _userQueries.SpecificationBelongsToUser(userId, id);
+            var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var specificationBelongsToUser = await _userQueries.SpecificationBelongsToUser(auth0Id, id);
             if (!specificationBelongsToUser)
             {
                 return Unauthorized();
@@ -61,15 +69,15 @@ namespace API.Controllers
         [HttpGet, Route("/api/[controller]/search")]
         public async Task<ActionResult<PaginatedResponse<IEnumerable<ShortSpecificationResponse>>>> Search([FromQuery] string searchText, [FromQuery]int pageNumber, [FromQuery]int itemCount, [FromQuery]string sortByTerm)
         {
-            SpecificationOrderOptions orderOption;
+            OrderingOptions orderOption;
             switch (sortByTerm)
             {
                 case null:
                 case "createdAtDesc":
-                    orderOption = SpecificationOrderOptions.CreatedAtDesc;
+                    orderOption = OrderingOptions.CreatedAtDesc;
                     break;
                 case "createdAtAsc":
-                    orderOption = SpecificationOrderOptions.CreatedAtAsc;
+                    orderOption = OrderingOptions.CreatedAtAsc;
                     break;
                 default:
                     return BadRequest("Sorting term is not valid");
@@ -102,15 +110,15 @@ namespace API.Controllers
         [HttpGet]
         public ActionResult<PaginatedResponse<IEnumerable<ShortSpecificationResponse>>> Get([FromQuery]int pageNumber = 0, [FromQuery]int itemCount = 10, [FromQuery]string sortByTerm = null)
         {
-            SpecificationOrderOptions orderOption;
+            OrderingOptions orderOption;
             switch (sortByTerm)
             {
                 case null:
                 case "createdAtDesc":
-                    orderOption = SpecificationOrderOptions.CreatedAtDesc;
+                    orderOption = OrderingOptions.CreatedAtDesc;
                     break;
                 case "createdAtAsc":
-                    orderOption = SpecificationOrderOptions.CreatedAtAsc;
+                    orderOption = OrderingOptions.CreatedAtAsc;
                     break;
                 default:
                     return BadRequest("Sorting term is not valid");
@@ -126,18 +134,32 @@ namespace API.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Specification>> Post(Specification specification)
+        public async Task<ActionResult<Specification>> Post(SpecificationUploadRequest requestModel)
         {
-            if (!_slugValidator.IsValid(specification.Slug))
+            var slug = await _slugService.GenerateUniqueSlug(requestModel.Title);
+
+            var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userQueries.FindUser(auth0Id);
+            if (user == null)
             {
-                return BadRequest("Slug is not valid");
-            }
-            else if (await _specificationQueries.SlugIsTaken(specification.Slug))
-            {
-                return BadRequest("Slug is taken");
+                if (!HttpContext.Request.Headers.TryGetValue("Authorization", out var token))
+                {
+                    throw new InvalidOperationException("Failed to get authorization header info");
+                }
+                var userDetails = await _auth0Service.CreateUser(token);
+                user = await _userCommands.InsertUser(auth0Id, userDetails.Email, userDetails.PictureUrl, userDetails.Nickname);
             }
 
-            specification.UserId = ((User)HttpContext.Items["User"]).Id;
+            var specification = new Specification
+            {
+                Slug = slug,
+                IntendedUse = requestModel.IntendedUse,
+                Title = requestModel.Title,
+                Audience = requestModel.Audience,
+                UserId = user.Id,
+                FunctionalRequirements = requestModel.FunctionalRequirements.Select((fr, idx) => new FunctionalRequirement{Description= fr, OrderNumber = (uint)idx}).ToList(),
+                NonFunctionalRequirements = requestModel.NonFunctionalRequirements.Select((nfr, idx) => new NonFunctionalRequirement{Description=nfr, OrderNumber = (uint)idx}).ToList()
+            };
 
             await _specificationCommands.InsertSpecification(specification);
             return CreatedAtAction(nameof(Get), new { id = specification.Id }, specification);
@@ -147,6 +169,12 @@ namespace API.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, SpecificationUpdateModel specificationUpdateModel)
         {
+            var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var specificationBelongsToUser = await _userQueries.SpecificationBelongsToUser(auth0Id, id);
+            if (!specificationBelongsToUser)
+            {
+                return Unauthorized();
+            }
             var specification = await _specificationQueries.FetchByIdAsync(id);
             if (id != specification.Id)
             {
@@ -183,13 +211,47 @@ namespace API.Controllers
 
         [HttpGet("my-specifications")]
         [Authorize]
-        public async Task<ActionResult<ShortenedSpecificationsResponse>> GetUserSpecifications()
+        public async Task<ActionResult<PaginatedResponse<IEnumerable<ShortSpecificationResponse>>>> GetUserSpecifications([FromQuery]int page = 0, [FromQuery]int itemCount = 10, [FromQuery]string ordering = null)
         {
-            var userEmail = ((User)HttpContext.Items["User"]).Email;
-            var specifications = await _specificationQueries.FetchUserSpecifications(userEmail);
+            OrderingOptions orderingOption;
+            switch (ordering)
+            {
+                case null:
+                case "createdAtDesc":
+                    orderingOption = OrderingOptions.CreatedAtDesc;
+                    break;
+                case "createdAtAsc":
+                    orderingOption = OrderingOptions.CreatedAtAsc;
+                    break;
+                default:
+                    return BadRequest("Sorting term is not valid");
+            }
+
+            var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userQueries.FindUser(auth0Id);
+            if (user == null)
+            {
+                return PaginatedResponseFactory.CreateEmpty<IEnumerable<ShortSpecificationResponse>>();
+            }
+            var specifications = await _specificationQueries.FetchUserSpecifications(user.Auth0Id, page, itemCount);
+
+            switch (orderingOption)
+            {
+                case OrderingOptions.CreatedAtAsc:
+                    specifications = specifications.OrderBy(spec => spec.CreatedAt);
+                    break;
+                case OrderingOptions.CreatedAtDesc:
+                default:
+                    specifications = specifications.OrderByDescending(spec => spec.CreatedAt);
+                    break;
+            }
+
+            var userSpecificationCount = await _specificationQueries.CountTotalUserSpecifications(user.Auth0Id);
             var shortenedSpecifications = _specificationResponseMapper.MapModelsToShortShortResponses(specifications);
 
-            return Ok(new ShortenedSpecificationsResponse { Specifications = shortenedSpecifications });
+            var response = PaginatedResponseFactory.Create(shortenedSpecifications, page, itemCount, userSpecificationCount);
+
+            return Ok(response);
         }
     }
 }

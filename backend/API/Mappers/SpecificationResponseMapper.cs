@@ -5,12 +5,6 @@ using Persistence.Models;
 
 namespace API.Mappers
 {
-    public interface ISpecificationResponseMapper
-    {
-        DetailedSpecificationResponse MapModelToDetailedResponse(Specification specification);
-        IEnumerable<ShortSpecificationResponse> MapModelsToShortShortResponses(IEnumerable<Specification> specifications);
-    }
-
     public class SpecificationResponseMapper : ISpecificationResponseMapper
     {
         public DetailedSpecificationResponse MapModelToDetailedResponse(Specification specification)

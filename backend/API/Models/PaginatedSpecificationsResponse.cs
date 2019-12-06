@@ -22,5 +22,10 @@ namespace API.Models
                 TotalItemCount = totalItemCount
             };
         }
+
+        public static PaginatedResponse<T> CreateEmpty<T>()
+        {
+            return new PaginatedResponse<T>();
+        }
     }
 }

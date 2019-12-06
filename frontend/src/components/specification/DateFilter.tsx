@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { MenuProps } from '@material-ui/core/Menu';
-import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Box } from '@material-ui/core';
 import DateDescendingIcon from '../Icons/DateDescendingIcon';
 import DateAscendingIcon from '../Icons/DateAscendingIcon';
 import { OrderingOptions } from '../../models/OrderingOptions';
@@ -60,6 +60,7 @@ const DateFilter = (props: DateFilterProps) => {
         setAnchorElement(null)
         props.orderChanged(orderingOption)
     }
+    
     const optionComponents = options.map((opt, index) => (
         <StyledMenuItem
             key={opt.term}
@@ -75,7 +76,7 @@ const DateFilter = (props: DateFilterProps) => {
     ));
 
     return (
-        <React.Fragment>
+        <Box>
             <IconButton
                 onClick={openFilterMenu}>
                 <SortIcon />
@@ -86,7 +87,7 @@ const DateFilter = (props: DateFilterProps) => {
                 onClose={handleFilterMenuClose}>
                 {optionComponents}
             </StyledMenu>
-        </React.Fragment>
+        </Box>
     )
 }
 

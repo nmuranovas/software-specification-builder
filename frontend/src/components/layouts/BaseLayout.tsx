@@ -82,9 +82,11 @@ const useStyles = makeStyles((theme: Theme) =>
             ...theme.mixins.toolbar,
         },
         content: {
+            display: "flex",
+            flexDirection: "column",
             flexGrow: 1,
             height: '100vh',
-            overflow: 'auto',
+            overflow: 'auto'
         },
         container: {
             paddingTop: theme.spacing(4),

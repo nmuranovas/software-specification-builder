@@ -6,6 +6,7 @@ import { useAuth0 } from '../../services/react-auth0-spa'
 import { fetchMySpecifications } from '../../services/BackendAPI'
 import { ShortenedSpecificationModel } from '../../models/Specification'
 import { classes } from 'istanbul-lib-coverage'
+import { OrderingOptions } from '../../models/OrderingOptions'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -18,31 +19,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Dashboard = () => {
     const styles = useStyles();
-    const { getTokenSilently } = useAuth0();
-    const [specifications, setSpecifications] = useState<ShortenedSpecificationModel[]>()
-    const [reloadRequested, setReloadRequested] = useState(false)
-
-    useEffect(() => {
-        const fetchSpecifications = async () => {
-            try {
-                const token = await getTokenSilently();
-                const response = await fetchMySpecifications(token);
-                setSpecifications(response.data.specifications)
-            } catch (error) {
-                console.log(error)
-            } finally {
-                setReloadRequested(false);
-            }
-        }
-
-        fetchSpecifications();
-    }, [reloadRequested])
-
-    const handleSpecReload = () => {
-        setReloadRequested(true);
-    }
-
-    const specListing = !specifications ? <div>Loading...</div> : <SpecificationListing specifications={specifications} onReloadSpecifications={handleSpecReload} />
 
     return (
         <Container maxWidth="lg" className={styles.container}>
@@ -51,7 +27,7 @@ const Dashboard = () => {
                     <DashboardMenu />
                 </Grid> */}
                 <Grid item xs={12}>
-                    {specListing}
+                <SpecificationListing />
                 </Grid>
             </Grid>
         </Container>

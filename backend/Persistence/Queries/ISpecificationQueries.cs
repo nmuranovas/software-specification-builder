@@ -11,13 +11,15 @@ namespace Persistence.Queries
         Task<Specification> FetchByIdAsync(int id);
         IEnumerable<Specification> FindAllByPageNumberAndSize(int pageNumber, int pageSize);
         int GetTotalSpecificationCount();
-        IEnumerable<Specification> FindAllByPageNumberAndSizeOrderedBy(int pageNumber, int pageSize, SpecificationOrderOptions orderOptions);
+        IEnumerable<Specification> FindAllByPageNumberAndSizeOrderedBy(int pageNumber, int pageSize, OrderingOptions orderOptions);
         Task<IReadOnlyCollection<Specification>> SearchByTextAsync(string searchText, int pageNumber, int itemCount,
-            SpecificationOrderOptions orderOption);
+            OrderingOptions orderOption);
 
         Task<int> CountSpecificationsThatMatchText(string searchText);
         Task<bool> SlugIsTaken(string slug);
         Task<Specification> FetchBySlugAsync(string slug);
-        Task<IEnumerable<Specification>> FetchUserSpecifications(string email);
+        Task<IEnumerable<Specification>> FetchUserSpecifications(string auth0Id);
+        Task<IEnumerable<Specification>> FetchUserSpecifications(string auth0Id, int page, int itemCount);
+        Task<int> CountTotalUserSpecifications(string auth0Id);
     }
 }

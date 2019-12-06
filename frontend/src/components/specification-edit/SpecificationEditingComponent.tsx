@@ -34,7 +34,7 @@ const SpecificationEditingComponent = () => {
     const classes = useStyles();
     const { slug } = useParams();
     const [specDetails, setSpecDetails] = useState<DetailedSpecification>()
-    const {getTokenSilently} = useAuth0();
+    const { getTokenSilently } = useAuth0();
 
     const [isLoading, setIsLoading] = useState(true)
 
@@ -43,9 +43,9 @@ const SpecificationEditingComponent = () => {
     const [intendedUse, setIntendedUse] = useState("")
     const handleIntendedUseChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setIntendedUse(event.target.value); }
     const [functionalRequirements, setFunctionalRequirements] = useState([""])
-    const handleFunctionalRequirementChange = (values: string[]) => { setFunctionalRequirements(values) }
+    const handleFunctionalRequirementChange = (name: string, values: string[]) => { setFunctionalRequirements(values) }
     const [nonFunctionalRequirements, setNonFunctionalRequirements] = useState([""])
-    const handleNonFunctionalRequirementChange = (values: string[]) => { setNonFunctionalRequirements(values) }
+    const handleNonFunctionalRequirementChange = (name: string, values: string[]) => { setNonFunctionalRequirements(values) }
 
     useEffect(() => {
         if (slug === undefined) {
@@ -74,7 +74,7 @@ const SpecificationEditingComponent = () => {
         return <div>error</div>
     }
 
-    
+
     const handleSubmit = async () => {
         const token = await getTokenSilently();
         const newModel: SpecificationUpdateModel = {
@@ -127,10 +127,24 @@ const SpecificationEditingComponent = () => {
                         label="Purpose" />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                    <ListEditingComponent title="Functional requirements" values={functionalRequirements} valuesChanged={handleFunctionalRequirementChange} />
+                    <ListEditingComponent
+                        title="Functional requirements"
+                        inputName="functionalRequirements"
+                    values={functionalRequirements}
+                    onFieldsNotValid={() => { throw new Error("Not implemented") }}
+                        onFieldsValid={() => { throw new Error("Not implemented") }}
+                        onValuesChange={handleFunctionalRequirementChange}
+                    />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                    <ListEditingComponent title="Non-Functional requirements" values={nonFunctionalRequirements} valuesChanged={handleNonFunctionalRequirementChange} />
+                    <ListEditingComponent
+                        inputName="nonFunctionalRequirements"
+                        title="Non-Functional requirements"
+                        onFieldsNotValid={() => { throw new Error("Not implemented") }}
+                    values={nonFunctionalRequirements}
+                    onValuesChange={handleNonFunctionalRequirementChange}
+                        onFieldsValid={() => { throw new Error("Not implemented") }}
+                    />
                 </Grid>
                 <Grid item xs={12}>
                     <Divider className={classes.divider} />

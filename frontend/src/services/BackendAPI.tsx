@@ -3,6 +3,7 @@ import Axios from "axios";
 import { PaginatedSpecificationResponse } from "./response-models/PaginatedSpecificationResponse";
 import { OrderingOptions } from "../models/OrderingOptions";
 import PaginatedResponse from "./response-models/PaginatedResponse";
+import { useAuth0 } from "./react-auth0-spa";
 
 export const fetchSpecData = async (slug: string) => {
     const { data } = await Axios.get(`/api/specification/${slug}`)
@@ -75,6 +76,7 @@ export type SpecificationUpdateModel = {
     functionalRequirements : string[]
     nonFunctionalRequirements : string[]
 }
+
 export const putSpecification = async (id: number, model: SpecificationUpdateModel, token: string) => {
     return await Axios.put(`/api/specification/${id}`, model, {
         headers: {
@@ -83,15 +85,22 @@ export const putSpecification = async (id: number, model: SpecificationUpdateMod
     })
 }
 
-export const fetchMySpecifications = async (token: string) => {
-    return await Axios.get(`/api/specification/my-specifications`, {
+export const fetchMySpecifications = async (token: string, page: number, itemCount: number, ordering: OrderingOptions) => {
+    const response = await Axios.get(`/api/specification/my-specifications`, {
+        params: {
+            page,
+            itemCount,
+            ordering
+        },
         headers: {
             Authorization: `Bearer ${token}`
         }
     });
+
+    return response.data as PaginatedResponse<ShortenedSpecificationModel[]>;
 }
 
-export const deleteSpecification = async (id: number, token: string) => {
+export const deleteSpecification = async (token: string, id: number) => {
     return await Axios.delete(`/api/specification/${id}`, {
         headers: {
             Authorization: `Bearer ${token}`

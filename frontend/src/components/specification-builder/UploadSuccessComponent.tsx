@@ -14,7 +14,7 @@ const UploadSuccessComponent = (props: UploadSuccessComponentProps) => {
                 <p>Specification successfuly uploaded!</p>
             </div>
             <div className={classes.fullWidth}>
-                <Link to={`/specification/${props.specificationSlug}`}>
+                <Link to={`/${props.specificationSlug}`}>
                     <Button>Go to specification</Button>
                 </Link>
             </div>

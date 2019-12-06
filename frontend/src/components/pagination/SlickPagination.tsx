@@ -1,6 +1,6 @@
 import React from 'react'
 import makeStyles from '@material-ui/styles/makeStyles';
-import { Theme, Container, Box, Button } from '@material-ui/core';
+import { Theme, Box, Button } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) => ({
     box: {
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         cursor: 'pointer',
         color: theme.palette.primary.main,
         margin: theme.spacing(0, 1)
-    }
+    },
 }));
 
 type SlickPaginationProps = {
@@ -35,9 +35,10 @@ const SlickPagination = (props: SlickPaginationProps) => {
 
     const pageNumbers = [];
     for (let i = 0; i < props.pageCount; i++) {
+        const isCurrentPageNumber = props.currentPage === i;
         pageNumbers.push(
-            <a key={i} style={{}} onClick={() => props.onPageChanged(i)}
-                className={props.currentPage === i ? styles.paginationActive : styles.paginationButton}>
+            <a key={i} onClick={isCurrentPageNumber ? () => {} : () => props.onPageChanged(i)}
+                className={isCurrentPageNumber ? styles.paginationActive : styles.paginationButton}>
                 {i + 1}
             </a>
         );

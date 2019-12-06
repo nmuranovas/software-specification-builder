@@ -1,10 +1,20 @@
 import React from 'react'
-import { Container, Typography } from '@material-ui/core'
-import classes from './Footer.module.css'
+import { Container, Typography, makeStyles } from '@material-ui/core'
+
+const useStyles = makeStyles(theme => ({
+    footer: {
+      padding: theme.spacing(3, 2),
+      marginTop: 'auto',
+      backgroundColor:
+        theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200],
+    },
+  }));
 
 const Footer = () => {
+    const styles = useStyles();
+
     return (
-        <footer className={classes.footer}>
+        <footer className={styles.footer}>
             <Container>
                 <Typography variant="h6" align="center" component="p" gutterBottom>
                     Software Specification Builder

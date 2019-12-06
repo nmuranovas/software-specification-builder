@@ -18,10 +18,10 @@ const Home = () => {
                 <CardContent>
                     <Typography variant="h5" component="h1" gutterBottom>
                         React-powered Software specification builder
-                    </Typography>
+                        </Typography>
                     <Typography variant="body2" component="h2" gutterBottom>
                         Build your software specification and export it to a .json, .csv file or embed it in your website!
-                    </Typography>
+                        </Typography>
                 </CardContent>
             </Card>
         </Container>

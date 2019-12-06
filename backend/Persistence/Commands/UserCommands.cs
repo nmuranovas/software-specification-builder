@@ -12,13 +12,14 @@ namespace Persistence.Commands
             _context = context;
         }
 
-        public async Task<User> InsertUser(string email, string pictureUrl, string username)
+        public async Task<User> InsertUser(string auth0Id, string email, string pictureUrl, string username)
         {
             var newUser = new User
             {
                 Email = email,
                 Username = username,
-                PictureUrl = pictureUrl
+                PictureUrl = pictureUrl,
+                Auth0Id = auth0Id
             };
 
             await _context.Users.AddAsync(newUser);

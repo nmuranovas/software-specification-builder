@@ -3,11 +3,11 @@ import { Container, Paper, Theme, Stepper, Step, StepLabel, Typography, Button, 
 import SpecificationInfoForm from './SpecificationInfoForm'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 import ListEditingComponent from './ListEditingComponent';
-import Axios from 'axios';
 import DottedSpinner from '../spinners/DottedSpinner';
 import UploadSuccessComponent from './UploadSuccessComponent';
-import { uploadSpecification, generateSlug } from '../../services/BackendAPI';
+import { uploadSpecification } from '../../services/BackendAPI';
 import { useAuth0 } from '../../services/react-auth0-spa';
+import { SpecUploadRequestModel, DefaultSpecUploadRequestModel } from '../../services/request-models/SpecUploadRequestModel';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,44 +40,33 @@ function getSteps() {
 const SpecificationBuilder = () => {
     const classes = useStyles();
     const steps = getSteps();
-    const {getTokenSilently} = useAuth0();
+    const { getTokenSilently } = useAuth0();
 
     const [activeStep, setActiveStep] = useState(0);
-    const [title, setTitle] = useState("")
-    const [audience, setAudience] = useState("")
-    const [intendedUse, setIntendedUse] = useState("")
-    const [slug, setSlug] = useState("")
+    const [specUploadModel, setSpecUploadModel] = useState<SpecUploadRequestModel>(DefaultSpecUploadRequestModel);
 
-    const [functionalRequirements, setFunctionalRequirements] = useState([""]);
-    const [nonFunctionalRequirements, setNonFunctionalRequirements] = useState([""]);
+    const [canContinue, setCanContinue] = useState(false);
+
     const [isLoading, setIsLoading] = useState(false)
     const [newSpecificationLink, setNewSpecificationLink] = useState("");
 
-    const handleNext = () => {
-        setActiveStep(prevActiveStep => prevActiveStep + 1);
-    }
+    const handleNext = () => { setActiveStep(prevActiveStep => prevActiveStep + 1); }
+    const handleBack = () => { setActiveStep(prevActiveStep => prevActiveStep - 1); }
+    const handleCanContinue = (value: boolean) => { setCanContinue(value); }
 
-    const handleBack = () => {
-        setActiveStep(prevActiveStep => prevActiveStep - 1);
-    }
+    const onValuesChange = (name: string, value: any) => { setSpecUploadModel({...specUploadModel, [name]:value}); }
 
     const postSpecification = () => {
         setIsLoading(true);
         handleNext();
-        const jsonifiedObj = JSON.stringify({
-            title,
-            audience,
-            intendedUse,
-            slug,
-            functionalRequirements: functionalRequirements.map((fr, index) => { return { description: fr, orderNumber: index } }),
-            nonFunctionalRequirements: nonFunctionalRequirements.map((fr, index) => { return { description: fr, orderNumber: index } }),
-        });
 
         setTimeout(async () => {
             const token: string = await getTokenSilently();
+            const jsonifiedObj = JSON.stringify(specUploadModel);
+
             uploadSpecification(jsonifiedObj, token).then(res => {
                 console.log(res)
-                setNewSpecificationLink(res.data.title);
+                setNewSpecificationLink(res.data.slug);
             }).catch(err => {
                 console.log(err)
             }).finally(() => {
@@ -86,27 +75,35 @@ const SpecificationBuilder = () => {
         }, 1000)
     }
 
-    const handleTitleChange = async (newValue: string) => {
-        setTitle(newValue);
-        const token: string = await getTokenSilently();
-        const response = await generateSlug(newValue, token);
-        setSlug(response.data)
-    }
-
     const getStepContent = (stepIndex: number) => {
         switch (stepIndex) {
             case 0:
                 return <SpecificationInfoForm
-                            intendedUse={intendedUse} intendedUseChanged={setIntendedUse}
-                            audience={audience} audienceChanged={setAudience}
-                            title={title} titleChanged={handleTitleChange}
-                            slug={slug} />;
+                    audience={specUploadModel.audience}
+                    title={specUploadModel.title}
+                    intendedUse={specUploadModel.intendedUse}
+                    onValuesChanged={onValuesChange}
+                    onFieldsValid={() => handleCanContinue(true)}
+                    onFieldsNotValid={() => handleCanContinue(false)}
+                />;
             case 1:
-                return <ListEditingComponent title="Functional requirements"
-                    values={functionalRequirements} valuesChanged={newValues => setFunctionalRequirements(newValues)} />;
+                return <ListEditingComponent 
+                    title="Functional requirements"
+                    inputName="functionalRequirements"
+                    values={specUploadModel.functionalRequirements}
+                    onValuesChange={onValuesChange}
+                    onFieldsValid={() => handleCanContinue(true)}
+                    onFieldsNotValid={() => handleCanContinue(false)}
+                    />;
             case 2:
-                return <ListEditingComponent title="Non-Functional requirement"
-                    values={nonFunctionalRequirements} valuesChanged={newValues => setNonFunctionalRequirements(newValues)} />
+                return <ListEditingComponent 
+                    title="Non-Functional requirement"
+                    inputName="nonFunctionalRequirements"
+                    values={specUploadModel.nonFunctionalRequirements}
+                    onValuesChange={onValuesChange}
+                    onFieldsValid={() => handleCanContinue(true)}
+                    onFieldsNotValid={() => handleCanContinue(false)}
+                    />
             default:
                 throw new Error("Step number out of range error");
         }
@@ -142,7 +139,7 @@ const SpecificationBuilder = () => {
                         onClick={handleBack}>
                         Back
                     </Button>
-                    <Button variant="contained" color="primary" onClick={activeStep === steps.length - 1 ? postSpecification : handleNext}>
+                    <Button variant="contained" disabled={!canContinue} color="primary" onClick={activeStep === steps.length - 1 ? postSpecification : handleNext}>
                         {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                     </Button>
                 </div>

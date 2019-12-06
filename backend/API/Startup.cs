@@ -1,5 +1,5 @@
 using API.Mappers;
-using API.Middleware;
+using API.Services;
 using API.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +38,8 @@ namespace API
             services.AddScoped<IUserQueries, UserQueries>();
             services.AddScoped<ISlugValidator, SlugValidator>();
             services.AddSingleton<ISpecificationResponseMapper, SpecificationResponseMapper>();
+            services.AddScoped<IAuth0Service, Auth0Service>();
+            services.AddScoped<ISlugService, SlugService>();
             services.AddHttpClient();
             
             // Auth0 service registration
@@ -69,7 +71,6 @@ namespace API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UserAuthenticationMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
